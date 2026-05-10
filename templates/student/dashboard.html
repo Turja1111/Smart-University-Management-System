@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Student Dashboard — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="hero-banner anim-slideUp" id="student-hero">
+    <h2 id="hero-title">Welcome back! 🎓</h2>
+    <p>Here's your academic overview for today.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="0" data-decimal="2" id="hero-cgpa">0.00</div>
+        <div class="hero-stat-label">Current CGPA</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="0" id="hero-att">0%</div>
+        <div class="hero-stat-label">Avg Attendance</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="0" id="hero-courses">0</div>
+        <div class="hero-stat-label">Enrolled Courses</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4 stagger mb-6" id="student-stat-grid">
+    <div class="stat-card violet">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">Current CGPA</div>
+      <div class="stat-value" data-count="0" data-decimal="2" id="stat-cgpa">0.00</div>
+      <div class="stat-sub">Out of 4.00</div>
+    </div>
+    <div class="stat-card emerald">
+      <div class="stat-icon">📅</div>
+      <div class="stat-label">Attendance</div>
+      <div class="stat-value" data-count="0" id="stat-att">0%</div>
+      <div class="stat-sub" id="stat-att-sub">—</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">📚</div>
+      <div class="stat-label">Enrolled Courses</div>
+      <div class="stat-value" data-count="0" id="stat-enrolled">0</div>
+      <div class="stat-sub">This semester</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">📝</div>
+      <div class="stat-label">Pending Work</div>
+      <div class="stat-value" data-count="0" id="stat-pending">0</div>
+      <div class="stat-sub">Assignments due</div>
+    </div>
+  </div>
+
+  <div class="grid-2 mb-6">
+    <div class="glass-card">
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">📈 CGPA Progress</div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="cgpa-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="glass-card">
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">🎯 Grade Distribution</div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="grade-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card mb-6">
+    <div class="glass-card-inner">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📅 Weekly Routine</div>
+          <div class="section-subtitle">Your class schedule</div>
+        </div>
+      </div>
+      <div class="day-tabs" id="routine-tabs"></div>
+      <div id="routine-content"></div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="glass-card-inner">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📝 Assignments</div>
+          <div class="section-subtitle">Your recent tasks</div>
+        </div>
+        <a href="/courses/" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Title</th>
+              <th>Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-tbody">
+            <tr>
+              <td colspan="4" class="table-empty">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Notices — SUMS{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">📢 Notice Board</div>
+      <div class="section-subtitle">University announcements</div>
+    </div>
+    <button class="btn btn-primary btn-sm hidden" id="notice-new-btn" type="button">+ New Notice</button>
+  </div>
+
+  <div id="notices-list" class="attendance-list"></div>
+{% endblock %}
+

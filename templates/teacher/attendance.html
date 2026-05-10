@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Teacher Attendance — SUMS{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">📅 Mark Attendance</div>
+      <div class="section-subtitle">Bulk mark attendance for a course</div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="glass-card-inner">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="ta-course">Course</label>
+          <select class="form-control" id="ta-course"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ta-date">Date</label>
+          <input class="form-control" type="date" id="ta-date" />
+        </div>
+      </div>
+
+      <div class="table-wrapper mt-6">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>ID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ta-tbody">
+            <tr><td colspan="3" class="table-empty">Select a course to load students…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6">
+        <button class="btn btn-primary btn-full" id="ta-submit" type="button">Submit Attendance</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

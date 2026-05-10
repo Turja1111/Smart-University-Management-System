@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+{% endblock %}
+
+{% block body %}
+  <div class="login-layout" id="login-layout">
+    <section class="login-left">
+      <div class="login-particles" aria-hidden="true">
+        <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div><div class="particle p4"></div>
+        <div class="particle p5"></div><div class="particle p6"></div><div class="particle p7"></div><div class="particle p8"></div>
+        <div class="particle p9"></div><div class="particle p10"></div><div class="particle p11"></div><div class="particle p12"></div>
+      </div>
+      <div class="login-left-content">
+        <div class="big-logo">🎓</div>
+        <h1>SUMS</h1>
+        <p>Smart University Management System — empowering students, teachers, and administrators with AI-driven insights.</p>
+        <div class="login-stats">
+          <div class="login-stat">
+            <div class="login-stat-value">40+</div>
+            <div class="login-stat-label">API Endpoints</div>
+          </div>
+          <div class="login-stat">
+            <div class="login-stat-value">3</div>
+            <div class="login-stat-label">AI Features</div>
+          </div>
+          <div class="login-stat">
+            <div class="login-stat-value">5</div>
+            <div class="login-stat-label">Dashboards</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="login-right">
+      <div class="login-form-container">
+        <div class="form-logo">
+          <div class="form-logo-icon">🎓</div>
+          <span class="form-logo-name">SUMS</span>
+        </div>
+
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your university account</p>
+
+        <div class="role-pills" id="role-pills">
+          <button class="role-pill selected" type="button" data-role="student">
+            <span class="pill-icon">🎓</span>Student
+          </button>
+          <button class="role-pill" type="button" data-role="teacher">
+            <span class="pill-icon">👨‍🏫</span>Teacher
+          </button>
+          <button class="role-pill" type="button" data-role="admin">
+            <span class="pill-icon">🛡️</span>Admin
+          </button>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group form-control-icon">
+            <label class="form-label" for="login-email">Email</label>
+            <span class="input-icon">✉️</span>
+            <input class="form-control" type="email" id="login-email" placeholder="you@university.edu" required autocomplete="email" />
+          </div>
+          <div class="form-group form-control-icon">
+            <label class="form-label" for="login-password">Password</label>
+            <span class="input-icon">🔒</span>
+            <input class="form-control" type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-full" id="login-submit-btn">Sign In</button>
+        </form>
+
+        <div class="login-divider">or</div>
+        <p class="login-switch">
+          Don’t have an account?
+          <a class="login-link" href="/register/">Register</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  {% include "partials/_toast.html" %}
+  {% include "partials/_modal.html" %}
+{% endblock %}
+

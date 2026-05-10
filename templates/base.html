@@ -1,0 +1,62 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SUMS — Smart University Management System{% endblock %}</title>
+    <meta
+      name="description"
+      content="Enterprise-grade AI-enabled university management platform for students, teachers, and administrators."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}" />
+    {% block page_css %}{% endblock %}
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>"
+    />
+  </head>
+  <body>
+    {% block body %}
+      <div class="app-shell" id="app-shell">
+        {% include "partials/_sidebar.html" %}
+        <div class="main-wrapper">
+          {% include "partials/_topbar.html" %}
+          <main id="main-content" class="main-content">
+            {% block content %}{% endblock %}
+          </main>
+        </div>
+      </div>
+      {% include "partials/_toast.html" %}
+      {% include "partials/_modal.html" %}
+      {% include "partials/_chatbot.html" %}
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module" src="{% static 'js/auth.js' %}"></script>
+    <script type="module" src="{% static 'js/api.js' %}"></script>
+    <script type="module" src="{% static 'js/utils.js' %}"></script>
+    <script type="module" src="{% static 'js/toast.js' %}"></script>
+    <script type="module" src="{% static 'js/modal.js' %}"></script>
+    <script type="module" src="{% static 'js/sidebar.js' %}"></script>
+    <script type="module" src="{% static 'js/topbar.js' %}"></script>
+    <script type="module" src="{% static 'js/chatbot.js' %}"></script>
+    <script type="module" src="{% static 'js/charts.js' %}"></script>
+    {% if page_js %}
+      <script type="module" src="{% static page_js %}"></script>
+    {% endif %}
+  </body>
+</html>
+

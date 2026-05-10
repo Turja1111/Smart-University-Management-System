@@ -1,0 +1,6 @@
+.chart-container { position: relative; padding: var(--s-6); }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-5); }
+.chart-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; }
+.chart-canvas-wrapper { position: relative; height: 220px; }
+.chart-canvas-lg { height: 280px; }
+

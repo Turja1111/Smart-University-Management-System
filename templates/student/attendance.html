@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Student Attendance — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/attendance.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="hero-banner anim-slideUp">
+    <h2>📅 Attendance Overview</h2>
+    <p>Track your attendance across all enrolled courses.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="att-avg">0%</div>
+        <div class="hero-stat-label">Average Attendance</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="att-courses">0</div>
+        <div class="hero-stat-label">Courses Tracked</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="att-good">0</div>
+        <div class="hero-stat-label">Good Standing</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-banner hidden" id="att-warning">
+    <div class="warning-icon">⚠️</div>
+    <div>
+      <strong class="warning-title">Attendance Warning</strong>
+      <p class="warning-text" id="att-warning-text"></p>
+    </div>
+  </div>
+
+  <div class="section-header mb-4">
+    <div>
+      <div class="section-title">Course-wise Attendance</div>
+      <div class="section-subtitle" id="att-subtitle">Loading…</div>
+    </div>
+  </div>
+
+  <div class="attendance-list stagger" id="attendance-list"></div>
+{% endblock %}
+

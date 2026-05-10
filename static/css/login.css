@@ -1,0 +1,159 @@
+.login-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+.login-left {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 50%, #10b981 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-10);
+}
+
+.login-left-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  text-align: center;
+}
+
+.big-logo {
+  font-size: 4rem;
+  margin-bottom: var(--s-4);
+}
+
+.login-left-content h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: var(--s-3);
+}
+
+.login-left-content p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.0625rem;
+  max-width: 420px;
+}
+
+.login-stats {
+  margin-top: var(--s-8);
+  display: flex;
+  gap: var(--s-8);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.login-stat { text-align: center; }
+.login-stat-value { font-size: 2rem; font-weight: 800; color: #fff; }
+.login-stat-label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); }
+
+.login-particles { position: absolute; inset: 0; pointer-events: none; }
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  animation-name: particleFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.particle.p1 { width: 14px; height: 14px; left: 12%; bottom: -14px; animation-duration: 18s; animation-delay: 0s; opacity: 0.25; }
+.particle.p2 { width: 28px; height: 28px; left: 28%; bottom: -28px; animation-duration: 22s; animation-delay: 2s; opacity: 0.18; }
+.particle.p3 { width: 10px; height: 10px; left: 45%; bottom: -10px; animation-duration: 16s; animation-delay: 5s; opacity: 0.3; }
+.particle.p4 { width: 22px; height: 22px; left: 62%; bottom: -22px; animation-duration: 20s; animation-delay: 1s; opacity: 0.2; }
+.particle.p5 { width: 18px; height: 18px; left: 78%; bottom: -18px; animation-duration: 24s; animation-delay: 4s; opacity: 0.22; }
+.particle.p6 { width: 34px; height: 34px; left: 88%; bottom: -34px; animation-duration: 26s; animation-delay: 6s; opacity: 0.15; }
+.particle.p7 { width: 12px; height: 12px; left: 6%; bottom: -12px; animation-duration: 19s; animation-delay: 3s; opacity: 0.28; }
+.particle.p8 { width: 26px; height: 26px; left: 36%; bottom: -26px; animation-duration: 23s; animation-delay: 7s; opacity: 0.17; }
+.particle.p9 { width: 16px; height: 16px; left: 52%; bottom: -16px; animation-duration: 21s; animation-delay: 8s; opacity: 0.2; }
+.particle.p10 { width: 30px; height: 30px; left: 70%; bottom: -30px; animation-duration: 25s; animation-delay: 9s; opacity: 0.14; }
+.particle.p11 { width: 20px; height: 20px; left: 84%; bottom: -20px; animation-duration: 17s; animation-delay: 10s; opacity: 0.24; }
+.particle.p12 { width: 24px; height: 24px; left: 18%; bottom: -24px; animation-duration: 27s; animation-delay: 11s; opacity: 0.16; }
+
+.login-right {
+  width: 480px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-10) var(--s-8);
+  background: var(--bg-primary);
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 380px;
+  animation: slideUpFade 0.5s ease-out forwards;
+}
+
+.form-logo { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-8); }
+.form-logo-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--gradient-hero);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 0 20px var(--accent-violet-glow);
+}
+.form-logo-name {
+  font-family: var(--font-heading);
+  font-size: 1.375rem;
+  font-weight: 700;
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle { margin-bottom: var(--s-8); }
+
+.role-pills { display: flex; gap: var(--s-2); margin-bottom: var(--s-6); }
+.role-pill {
+  flex: 1;
+  padding: 9px;
+  text-align: center;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-glass);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.role-pill:hover { border-color: var(--accent-violet); color: var(--text-primary); }
+.role-pill.selected {
+  background: rgba(124, 58, 237, 0.18);
+  border-color: var(--accent-violet);
+  color: var(--text-primary);
+}
+.pill-icon { display: block; font-size: 1.125rem; margin-bottom: 4px; }
+
+.login-divider {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: var(--s-5) 0;
+  position: relative;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 24px);
+  height: 1px;
+  background: var(--border-glass);
+}
+.login-divider::before { left: 0; }
+.login-divider::after { right: 0; }
+
+.login-switch { text-align: center; font-size: 0.9rem; color: var(--text-secondary); }
+.login-link { color: var(--accent-violet); font-weight: 600; }
+

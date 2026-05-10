@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Departments — SUMS{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">🏛️ Departments</div>
+      <div class="section-subtitle">Manage departments and courses</div>
+    </div>
+    <button class="btn btn-primary btn-sm" id="dept-add-btn" type="button">+ Add Department</button>
+  </div>
+
+  <div class="grid-3" id="departments-grid"></div>
+{% endblock %}
+

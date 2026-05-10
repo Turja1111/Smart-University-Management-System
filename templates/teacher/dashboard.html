@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Teacher Dashboard — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="hero-banner anim-slideUp">
+    <h2 id="teacher-hero-title">Good morning! 👨‍🏫</h2>
+    <p>Your teaching overview and quick actions.</p>
+  </div>
+
+  <div class="grid-4 stagger mb-6">
+    <div class="stat-card blue">
+      <div class="stat-icon">📚</div>
+      <div class="stat-label">Courses</div>
+      <div class="stat-value" data-count="0" id="t-stat-courses">0</div>
+      <div class="stat-sub">This semester</div>
+    </div>
+    <div class="stat-card violet">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-label">Students</div>
+      <div class="stat-value" data-count="0" id="t-stat-students">0</div>
+      <div class="stat-sub">Across courses</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">📝</div>
+      <div class="stat-label">Pending Gradings</div>
+      <div class="stat-value" data-count="0" id="t-stat-pending">0</div>
+      <div class="stat-sub">Submissions</div>
+    </div>
+    <div class="stat-card emerald">
+      <div class="stat-icon">📢</div>
+      <div class="stat-label">Notices Posted</div>
+      <div class="stat-value" data-count="0" id="t-stat-notices">0</div>
+      <div class="stat-sub">This month</div>
+    </div>
+  </div>
+
+  <div class="section-header mb-4">
+    <div>
+      <div class="section-title">📚 My Courses</div>
+      <div class="section-subtitle">Quick actions for attendance and grading</div>
+    </div>
+  </div>
+  <div class="grid-3" id="teacher-courses-grid"></div>
+
+  <div class="grid-2 mt-8">
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title">📊 Score Distribution</div>
+        <div class="section-subtitle">Select a course to view analytics</div>
+        <div class="chart-canvas-wrapper chart-canvas-lg">
+          <canvas id="teacher-bar-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title">🤖 AI Tools</div>
+        <div class="section-subtitle">Smart assistance for teaching</div>
+        <div class="ai-tools-grid mt-6">
+          <a class="btn btn-secondary btn-full" href="/ai/">Summarize Submissions</a>
+          <a class="btn btn-secondary btn-full" href="/ai/">Check Plagiarism</a>
+          <a class="btn btn-secondary btn-full" href="/ai/">At-Risk Students</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

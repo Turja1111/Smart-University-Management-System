@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+{% endblock %}
+
+{% block body %}
+  <div class="login-layout" id="login-layout">
+    <section class="login-left">
+      <div class="login-particles" aria-hidden="true">
+        <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div><div class="particle p4"></div>
+        <div class="particle p5"></div><div class="particle p6"></div><div class="particle p7"></div><div class="particle p8"></div>
+        <div class="particle p9"></div><div class="particle p10"></div><div class="particle p11"></div><div class="particle p12"></div>
+      </div>
+      <div class="login-left-content">
+        <div class="big-logo">🎓</div>
+        <h1>SUMS</h1>
+        <p>Create your account to access dashboards, courses, notices, and AI tools.</p>
+        <div class="login-stats">
+          <div class="login-stat">
+            <div class="login-stat-value">Secure</div>
+            <div class="login-stat-label">JWT Auth</div>
+          </div>
+          <div class="login-stat">
+            <div class="login-stat-value">Real-time</div>
+            <div class="login-stat-label">Notices</div>
+          </div>
+          <div class="login-stat">
+            <div class="login-stat-value">AI</div>
+            <div class="login-stat-label">Insights</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="login-right">
+      <div class="login-form-container">
+        <div class="form-logo">
+          <div class="form-logo-icon">🎓</div>
+          <span class="form-logo-name">SUMS</span>
+        </div>
+
+        <h2>Create account</h2>
+        <p class="subtitle">Join your university platform</p>
+
+        <div class="role-pills" id="role-pills">
+          <button class="role-pill selected" type="button" data-role="student">
+            <span class="pill-icon">🎓</span>Student
+          </button>
+          <button class="role-pill" type="button" data-role="teacher">
+            <span class="pill-icon">👨‍🏫</span>Teacher
+          </button>
+        </div>
+
+        <form id="register-form">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="reg-first">First Name</label>
+              <input class="form-control" type="text" id="reg-first" placeholder="John" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-last">Last Name</label>
+              <input class="form-control" type="text" id="reg-last" placeholder="Doe" required />
+            </div>
+          </div>
+
+          <div class="form-group form-control-icon">
+            <label class="form-label" for="reg-email">Email</label>
+            <span class="input-icon">✉️</span>
+            <input class="form-control" type="email" id="reg-email" placeholder="you@university.edu" required autocomplete="email" />
+          </div>
+          <div class="form-group form-control-icon">
+            <label class="form-label" for="reg-pass">Password</label>
+            <span class="input-icon">🔒</span>
+            <input class="form-control" type="password" id="reg-pass" placeholder="Min. 8 characters" required autocomplete="new-password" />
+          </div>
+          <div class="form-group form-control-icon">
+            <label class="form-label" for="reg-pass2">Confirm Password</label>
+            <span class="input-icon">🔒</span>
+            <input class="form-control" type="password" id="reg-pass2" placeholder="Repeat password" required autocomplete="new-password" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-full" id="reg-submit-btn">Create Account</button>
+        </form>
+
+        <div class="login-divider">or</div>
+        <p class="login-switch">
+          Already have an account?
+          <a class="login-link" href="/login/">Sign in</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  {% include "partials/_toast.html" %}
+  {% include "partials/_modal.html" %}
+{% endblock %}
+

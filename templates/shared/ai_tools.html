@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tools — SUMS{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">🤖 AI Tools</div>
+      <div class="section-subtitle">Predictions and reputation insights</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title">Weak Student Prediction</div>
+        <div class="section-subtitle">At-risk students list</div>
+        <div class="table-wrapper mt-4">
+          <table>
+            <thead><tr><th>Student</th><th>Course</th><th>Attendance</th><th>Risk</th></tr></thead>
+            <tbody id="ai-weak-tbody"><tr><td colspan="4" class="table-empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title">Academic Reputation Score</div>
+        <div class="section-subtitle">0–100 score</div>
+        <div class="table-wrapper mt-4">
+          <table>
+            <thead><tr><th>Student</th><th>Score</th></tr></thead>
+            <tbody id="ai-rep-tbody"><tr><td colspan="2" class="table-empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
