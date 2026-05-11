@@ -28,29 +28,27 @@ async function render() {
     const role = getRole();
 
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-empty">No courses available.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No courses available.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = list
       .map((c) => {
-        const teacher = c.teacher_name || "—";
+        const teacher = c.teacher_name || c.schedule?.faculty_theory_initial || "—";
         const sched = summarizeSchedule(c.schedule);
-        const action = `<span class="text-muted">—</span>`;
         return `<tr>
           <td>${c.code || "—"}</td>
           <td>${c.name || "—"}</td>
           <td>${teacher}</td>
           <td>${c.credits ?? "—"}</td>
           <td class="schedule-cell">${sched}</td>
-          <td>${action}</td>
         </tr>`;
       })
       .join("");
 
 
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="6" class="table-empty">Could not load courses.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">Could not load courses.</td></tr>`;
     toast.error("Load failed", e?.message || "Try logging in again.");
   }
 }

@@ -35,10 +35,26 @@ function summarizeSchedule(schedule) {
   return parts.join("; ") + more;
 }
 
+function getBaseCode(code) {
+  if (!code) return "";
+  return code.split("-")[0].trim().toUpperCase();
+}
+
 function checkConflict(newCourse) {
+  const newBaseCode = getBaseCode(newCourse.code);
   const newSlots = newCourse.schedule?.slots || [];
   
   for (const enr of enrolledCourses) {
+    const existingBaseCode = getBaseCode(enr.course.code);
+    
+    // Check for same base course
+    if (newBaseCode === existingBaseCode) {
+      return {
+        conflict: true,
+        message: `You are already enrolled in ${enr.course.code}. You cannot take multiple sections of ${newBaseCode}.`
+      };
+    }
+
     const existingSlots = enr.course.schedule?.slots || [];
     
     for (const ns of newSlots) {
@@ -57,7 +73,7 @@ function checkConflict(newCourse) {
         if (smA !== null && smB !== null && intervalsOverlap(smA, emA, smB, emB)) {
           return {
             conflict: true,
-            message: `Clash detected on ${ns.weekday}: ${newCourse.code} overlaps with ${enr.course.code}.`
+            message: `Time clash detected on ${ns.weekday}: ${newCourse.code} (${ns.start_time}) overlaps with ${enr.course.code} (${es.start_time}).`
           };
         }
       }
@@ -191,13 +207,25 @@ function renderGrid() {
 
 function renderAvailable() {
   const tbody = document.getElementById("available-courses-tbody");
+  const searchInput = document.getElementById("course-search-input");
+  const query = (searchInput ? searchInput.value.toLowerCase().trim() : "");
   
-  // Filter out already enrolled courses
+  if (!query) {
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">Type a course code or name to search...</td></tr>`;
+    return;
+  }
+
+  // Filter out already enrolled courses and match query
   const enrolledIds = new Set(enrolledCourses.map(e => e.course.id));
-  const toShow = availableCourses.filter(c => !enrolledIds.has(c.id));
+  const toShow = availableCourses.filter(c => {
+    if (enrolledIds.has(c.id)) return false;
+    const code = (c.code || "").toLowerCase();
+    const name = (c.name || "").toLowerCase();
+    return code.includes(query) || name.includes(query);
+  });
 
   if (!toShow.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No more courses available.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No matching courses found.</td></tr>`;
     return;
   }
 
@@ -227,6 +255,10 @@ function render() {
 }
 
 async function init() {
+  document.getElementById("course-search-input")?.addEventListener("input", () => {
+    renderAvailable();
+  });
+
   try {
     await ensureMeLoaded();
     
