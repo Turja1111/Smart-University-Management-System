@@ -17,7 +17,13 @@ class StudentProfile(models.Model):
     total_credits_completed = models.PositiveIntegerField(default=0)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
-    emergency_contact = models.CharField(max_length=20, blank=True)
+    emergency_contact_name = models.CharField(max_length=120, blank=True)
+    emergency_contact = models.CharField(max_length=40, blank=True, help_text='Phone or alternate contact')
+    birth_certificate_no = models.CharField(max_length=80, blank=True)
+    passport_no = models.CharField(max_length=40, blank=True)
+    admission_session = models.CharField(
+        max_length=40, blank=True, help_text='e.g. SPRING 2022'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -83,18 +83,38 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
+# Database — PostgreSQL only (all ORM data persists here).
+# Prefer DATABASE_URL (Neon, Supabase, Railway, Render, etc.); otherwise set DB_* variables.
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+_db_url = config('DATABASE_URL', default='').strip()
+_db_conn_max_age = config('DB_CONN_MAX_AGE', default=600, cast=int)
+
+if _db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            _db_url,
+            conn_max_age=_db_conn_max_age,
+        ),
     }
-}
+    # Ensure engine is PostgreSQL even if URL uses postgres:// alias
+    if DATABASES['default'].get('ENGINE') == 'django.db.backends.sqlite3':
+        raise ValueError('DATABASE_URL must be a PostgreSQL URL, not SQLite.')
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': _db_conn_max_age,
+            'OPTIONS': {
+                # Safer defaults for managed PostgreSQL; harmless for local.
+                'connect_timeout': config('DB_CONNECT_TIMEOUT', default=10, cast=int),
+            },
+        },
+    }
 
 # Custom user model
 AUTH_USER_MODEL = 'accounts.User'

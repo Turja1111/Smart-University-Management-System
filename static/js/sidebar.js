@@ -3,8 +3,10 @@ import { getDisplayName, getInitials, getRole, isLoggedIn, logout } from "./auth
 const NAV = {
   student: [
     { icon: "🏠", label: "Dashboard", href: "/student/dashboard/" },
+    { icon: "👤", label: "Profile", href: "/student/profile/" },
     { icon: "📚", label: "Courses", href: "/courses/" },
     { icon: "📅", label: "Attendance", href: "/student/attendance/" },
+    { icon: "🧠", label: "Advising", href: "/student/advising/" },
     { icon: "📊", label: "Results", href: "/student/exams/" },
     { icon: "📢", label: "Notices", href: "/notices/" },
     { icon: "🤖", label: "AI Tools", href: "/ai/" },
@@ -50,7 +52,11 @@ export function initSidebar() {
   if (itemsHost) {
     itemsHost.innerHTML = links
       .map((l) => {
-        const isActive = activePath() === l.href;
+        const path = activePath();
+        const isActive =
+          l.href === "/student/profile/"
+            ? path === "/student/profile/"
+            : path === l.href;
         return `
           <a class="nav-item${isActive ? " active" : ""}" href="${l.href}">
             <span class="nav-icon">${l.icon}</span>

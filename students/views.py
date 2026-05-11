@@ -12,7 +12,7 @@ from courses.schedule_utils import build_by_day_for_enrollments
 
 
 class StudentProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStudent]
 
     def get_serializer_class(self):
         if self.request.method in ('PUT', 'PATCH'):

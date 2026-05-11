@@ -2,6 +2,7 @@ import { getDisplayName, getInitials, getRole, getUser, isLoggedIn, logout } fro
 
 const TITLES = {
   "/student/dashboard/": "Dashboard",
+  "/student/profile/": "Student",
   "/student/attendance/": "My Attendance",
   "/student/exams/": "Results & Exams",
   "/teacher/dashboard/": "Dashboard",
@@ -26,6 +27,11 @@ export function initTopbar() {
   document.getElementById("page-title").textContent = TITLES[window.location.pathname] || "SUMS";
   const role = getRole() || "student";
   document.getElementById("breadcrumb").textContent = `SUMS · ${role.charAt(0).toUpperCase() + role.slice(1)}`;
+
+  const onProfile = window.location.pathname === "/student/profile/";
+  document.getElementById("topbar-profile-search")?.classList.toggle("hidden", !onProfile);
+  document.getElementById("topbar-expand-btn")?.classList.toggle("hidden", !onProfile);
+  document.getElementById("dropdown-student-profile-link")?.classList.toggle("hidden", role !== "student");
 
   document.getElementById("topbar-avatar-btn").textContent = getInitials();
   document.getElementById("dropdown-profile-name").textContent = getDisplayName();

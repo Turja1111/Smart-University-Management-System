@@ -65,9 +65,11 @@ export const api = {
     register: (d) => api.post("/auth/register/", d),
     logout: (d) => api.post("/auth/logout/", d),
     me: () => api.get("/auth/me/"),
+    updateMe: (d) => api.patch("/auth/me/", d),
   },
   students: {
     profile: () => api.get("/students/profile/"),
+    updateProfile: (d) => api.patch("/students/profile/", d),
     cgpa: () => api.get("/students/cgpa/"),
     routine: () => api.get("/students/routine/"),
   },

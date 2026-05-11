@@ -7,7 +7,15 @@
         <div class="breadcrumb" id="breadcrumb">SUMS</div>
       </div>
     </div>
+    <div class="topbar-center hidden" id="topbar-profile-search" aria-hidden="true">
+      <div class="profile-topbar-search">
+        <span class="profile-topbar-search-icon" aria-hidden="true">🔍</span>
+        <input type="search" class="profile-topbar-search-input" placeholder="Search" readonly id="profile-topbar-search-input" />
+        <kbd class="profile-topbar-kbd">CTRL K</kbd>
+      </div>
+    </div>
     <div class="topbar-right">
+      <button class="topbar-btn hidden" id="topbar-expand-btn" type="button" title="Full screen">⛶</button>
       <button class="topbar-btn" id="notif-btn" type="button" title="Notices">
         🔔
         <span class="topbar-badge hidden" id="notif-badge">0</span>
@@ -20,6 +28,7 @@
             <span class="dropdown-profile-email" id="dropdown-profile-email"></span>
           </div>
           <div class="dropdown-divider"></div>
+          <a class="dropdown-item dropdown-item-link hidden" id="dropdown-student-profile-link" href="/student/profile/">👤 Profile</a>
           <button class="dropdown-item danger" id="topbar-logout" type="button">🚪 Logout</button>
         </div>
       </div>

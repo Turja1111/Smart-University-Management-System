@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Advising Panel — SUMS{% endblock %}
+
+{% block page_css %}
+<style>
+  .advising-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .split-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 1024px) {
+    .split-layout {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+  .schedule-grid-container {
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+  }
+  .schedule-table th, .schedule-table td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .schedule-table th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+  .schedule-table td {
+    height: 80px;
+    color: var(--text-secondary);
+  }
+  .time-cell {
+    font-weight: 600;
+    background: var(--bg-secondary);
+    width: 120px;
+    color: var(--text-primary);
+  }
+  .course-pill {
+    background: var(--primary-bg);
+    color: var(--primary-color);
+    padding: 8px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .course-pill.lab {
+    background: var(--warning-bg);
+    color: var(--warning-color);
+  }
+  .action-cell {
+    width: 100px;
+  }
+  .btn-remove {
+    background: var(--danger-bg);
+    color: var(--danger-color);
+  }
+  .btn-remove:hover {
+    opacity: 0.8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">🧠 Advising Panel</div>
+      <div class="section-subtitle">Select courses and build your schedule</div>
+    </div>
+  </div>
+
+  <div class="advising-container">
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title mb-4" style="font-size: 1.25rem;">Available Courses</div>
+        <div class="table-wrapper" style="max-height: 400px; overflow-y: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Credits</th>
+                <th>Schedule</th>
+                <th class="action-cell">Action</th>
+              </tr>
+            </thead>
+            <tbody id="available-courses-tbody">
+              <tr><td colspan="5" class="table-empty">Loading courses...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="glass-card-inner">
+        <div class="section-title mb-4" style="font-size: 1.25rem;">Class and Exam Schedule</div>
+        <div class="schedule-grid-container">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>TIME/DAY</th>
+                <th>SUNDAY</th>
+                <th>MONDAY</th>
+                <th>TUESDAY</th>
+                <th>WEDNESDAY</th>
+                <th>THURSDAY</th>
+                <th>FRIDAY</th>
+                <th>SATURDAY</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-grid-tbody">
+              <tr>
+                <td colspan="8" class="table-empty">No courses selected yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

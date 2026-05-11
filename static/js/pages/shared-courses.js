@@ -15,17 +15,7 @@ function summarizeSchedule(schedule) {
   return parts.join("; ") + more;
 }
 
-async function enroll(courseId, btn) {
-  try {
-    btn.disabled = true;
-    await api.courses.enroll(courseId);
-    toast.success("Enrolled", "You are now enrolled in this course.");
-    btn.replaceWith(document.createTextNode("Enrolled"));
-  } catch (e) {
-    toast.error("Enrollment failed", e?.data?.error || e.message || "Try again.");
-    btn.disabled = false;
-  }
-}
+// Enroll functionality moved to Advising panel.
 
 async function render() {
   const tbody = document.getElementById("courses-tbody");
@@ -46,12 +36,7 @@ async function render() {
       .map((c) => {
         const teacher = c.teacher_name || "—";
         const sched = summarizeSchedule(c.schedule);
-        const action =
-          role === "student"
-            ? `<button type="button" class="btn btn-primary btn-sm" data-enroll="${c.id}">Enroll</button>`
-            : role === "admin"
-              ? `<span class="text-muted">—</span>`
-              : `<span class="text-muted">—</span>`;
+        const action = `<span class="text-muted">—</span>`;
         return `<tr>
           <td>${c.code || "—"}</td>
           <td>${c.name || "—"}</td>
@@ -63,9 +48,7 @@ async function render() {
       })
       .join("");
 
-    tbody.querySelectorAll("[data-enroll]").forEach((btn) => {
-      btn.addEventListener("click", () => enroll(parseInt(btn.dataset.enroll, 10), btn));
-    });
+
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="6" class="table-empty">Could not load courses.</td></tr>`;
     toast.error("Load failed", e?.message || "Try logging in again.");

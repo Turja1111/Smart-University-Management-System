@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_attrs %}class="page-student-profile"{% endblock %}
+
+{% block title %}Student Profile — SUMS{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'css/student-profile.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="profile-shell" id="profile-shell">
+    <section class="profile-hero-card" id="profile-hero">
+      <div class="profile-hero-main">
+        <div class="profile-photo-wrap">
+          <img src="" alt="" class="profile-photo hidden" id="profile-photo" width="120" height="120" />
+          <div class="profile-photo-placeholder" id="profile-photo-ph">?</div>
+        </div>
+        <div class="profile-hero-text">
+          <h1 class="profile-name" id="profile-display-name">—</h1>
+          <div class="profile-meta-row">
+            <span class="profile-meta-item" id="meta-student-id">🪪 <span>—</span></span>
+            <span class="profile-meta-item" id="meta-department">🏛️ <span>—</span></span>
+            <span class="profile-meta-item" id="meta-admission">📅 <span>—</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="profile-stat-row">
+        <div class="profile-stat-box">
+          <div class="profile-stat-icon" aria-hidden="true">🏆</div>
+          <div class="profile-stat-value" id="stat-credits">0</div>
+          <div class="profile-stat-label">Earned Credit</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="profile-stat-icon" aria-hidden="true">📈</div>
+          <div class="profile-stat-value" id="stat-cgpa">0.00</div>
+          <div class="profile-stat-label">CGPA</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="profile-stat-icon" aria-hidden="true">📆</div>
+          <div class="profile-stat-value profile-stat-value-sm" id="stat-current-sem">—</div>
+          <div class="profile-stat-label">Current Semester</div>
+        </div>
+      </div>
+      <div class="profile-tabs" role="tablist">
+        <button type="button" class="profile-tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+        <button type="button" class="profile-tab" data-tab="misc" role="tab" aria-selected="false">Miscellaneous Info</button>
+        <button type="button" class="profile-tab" data-tab="academic" role="tab" aria-selected="false">Academic Info</button>
+      </div>
+    </section>
+
+    <section class="profile-detail-card" id="panel-overview" data-panel="overview">
+      <div class="profile-detail-head">
+        <h2 class="profile-detail-title">Overview</h2>
+        <div class="profile-detail-actions">
+          <button type="button" class="profile-btn-secondary" id="btn-update-email">✉️ Update Email</button>
+          <button type="button" class="profile-btn-secondary" id="btn-edit-overview">✏️ Edit</button>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-field"><span class="profile-label">Full name</span><span class="profile-value" id="ov-full-name">—</span></div>
+        <div class="profile-field"><span class="profile-label">Mobile no</span><span class="profile-value" id="ov-phone">—</span></div>
+        <div class="profile-field"><span class="profile-label">Email</span><span class="profile-value" id="ov-email">—</span></div>
+        <div class="profile-field"><span class="profile-label">Date of birth</span><span class="profile-value" id="ov-dob">—</span></div>
+        <div class="profile-field"><span class="profile-label">Emergency contact name</span><span class="profile-value" id="ov-em-name">—</span></div>
+        <div class="profile-field"><span class="profile-label">Emergency contact no.</span><span class="profile-value" id="ov-em-phone">—</span></div>
+        <div class="profile-field"><span class="profile-label">Birth certificate no</span><span class="profile-value" id="ov-bc">—</span></div>
+        <div class="profile-field"><span class="profile-label">Passport no</span><span class="profile-value" id="ov-passport">—</span></div>
+      </div>
+    </section>
+
+    <section class="profile-detail-card hidden" id="panel-misc" data-panel="misc">
+      <div class="profile-detail-head">
+        <h2 class="profile-detail-title">Miscellaneous Info</h2>
+        <button type="button" class="profile-btn-secondary" id="btn-edit-misc">✏️ Edit</button>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-field profile-field-wide"><span class="profile-label">Address</span><span class="profile-value" id="misc-address">—</span></div>
+        <div class="profile-field"><span class="profile-label">Admission session</span><span class="profile-value" id="misc-admission">—</span></div>
+        <div class="profile-field"><span class="profile-label">Batch</span><span class="profile-value" id="misc-batch">—</span></div>
+        <div class="profile-field"><span class="profile-label">Emergency contact name</span><span class="profile-value" id="misc-em-name">—</span></div>
+        <div class="profile-field"><span class="profile-label">Emergency contact no.</span><span class="profile-value" id="misc-em-phone">—</span></div>
+        <div class="profile-field"><span class="profile-label">Birth certificate no</span><span class="profile-value" id="misc-bc">—</span></div>
+        <div class="profile-field"><span class="profile-label">Passport no</span><span class="profile-value" id="misc-passport">—</span></div>
+      </div>
+    </section>
+
+    <section class="profile-detail-card hidden" id="panel-academic" data-panel="academic">
+      <div class="profile-detail-head">
+        <h2 class="profile-detail-title">Academic Info</h2>
+        <button type="button" class="profile-btn-secondary" id="btn-edit-academic">✏️ Edit</button>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-field"><span class="profile-label">Student ID</span><span class="profile-value" id="ac-student-id">—</span></div>
+        <div class="profile-field"><span class="profile-label">Department</span><span class="profile-value" id="ac-dept">—</span></div>
+        <div class="profile-field"><span class="profile-label">Current semester (number)</span><span class="profile-value" id="ac-semester">—</span></div>
+        <div class="profile-field"><span class="profile-label">CGPA (record)</span><span class="profile-value" id="ac-cgpa-record">—</span></div>
+        <div class="profile-field"><span class="profile-label">Earned credits</span><span class="profile-value" id="ac-credits">—</span></div>
+        <div class="profile-field profile-field-wide"><span class="profile-label">Semester performance</span><span class="profile-value profile-value-block" id="ac-perf">—</span></div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

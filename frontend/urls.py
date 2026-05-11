@@ -9,8 +9,10 @@ urlpatterns = [
     path("register/", views.register_page, name="register"),
     # Student
     path("student/dashboard/", views.student_dashboard, name="student_dashboard"),
+    path("student/profile/", views.student_profile, name="student_profile"),
     path("student/attendance/", views.student_attendance, name="student_attendance"),
     path("student/exams/", views.student_exams, name="student_exams"),
+    path("student/advising/", views.student_advising, name="student_advising"),
     # Teacher
     path("teacher/dashboard/", views.teacher_dashboard, name="teacher_dashboard"),
     path("teacher/attendance/", views.teacher_attendance, name="teacher_attendance"),

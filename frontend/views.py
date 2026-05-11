@@ -22,6 +22,14 @@ def student_dashboard(request: HttpRequest) -> HttpResponse:
     )
 
 
+def student_profile(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "student/profile.html",
+        {"page_js": "js/pages/student-profile.js"},
+    )
+
+
 def student_attendance(request: HttpRequest) -> HttpResponse:
     return render(
         request,
@@ -32,6 +40,14 @@ def student_attendance(request: HttpRequest) -> HttpResponse:
 
 def student_exams(request: HttpRequest) -> HttpResponse:
     return render(request, "student/exams.html", {"page_js": "js/pages/student-exams.js"})
+
+
+def student_advising(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "student/advising.html",
+        {"page_js": "js/pages/student-advising.js"},
+    )
 
 
 def teacher_dashboard(request: HttpRequest) -> HttpResponse:
