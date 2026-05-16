@@ -1,11 +1,3 @@
-"""
-Load courses from routine_extracted.json (sections array) into the database.
-
-Example:
-  python manage.py load_routine
-  python manage.py load_routine --path routine_extracted.json --clear
-  python manage.py load_routine --enroll-email student@test.com --enroll-limit 24
-"""
 from __future__ import annotations
 
 import json
