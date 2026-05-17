@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Courses — SUMS{% endblock %}
+
+{% block content %}
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">📚 Manage Courses</div>
+      <div class="section-subtitle">Create, update, or remove university courses.</div>
+    </div>
+    <div class="flex gap-3">
+      <button id="btn-add-course" class="btn btn-primary">➕ Add Course</button>
+    </div>
+  </div>
+
+  <div class="glass-card mb-5">
+    <div class="glass-card-inner flex gap-3" style="align-items:center;">
+      <div class="form-control-icon flex-1" style="max-width: 400px;">
+        <span class="input-icon">🔍</span>
+        <input type="text" id="search-courses" class="form-control" placeholder="Search by course name or code..." />
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="glass-card-inner">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Credits</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-courses-tbody">
+            <tr><td colspan="6" class="table-empty">Loading courses…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

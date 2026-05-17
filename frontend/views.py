@@ -42,6 +42,14 @@ def student_exams(request: HttpRequest) -> HttpResponse:
     return render(request, "student/exams.html", {"page_js": "js/pages/student-exams.js"})
 
 
+def student_grade_sheet(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "student/grade-sheet.html",
+        {"page_js": "js/pages/student-grade-sheet.js"},
+    )
+
+
 def student_advising(request: HttpRequest) -> HttpResponse:
     return render(
         request,
@@ -92,6 +100,10 @@ def admin_departments(request: HttpRequest) -> HttpResponse:
         "admin/departments.html",
         {"page_js": "js/pages/admin-departments.js"},
     )
+
+
+def admin_courses(request: HttpRequest) -> HttpResponse:
+    return render(request, "admin/courses.html", {"page_js": "js/pages/admin-courses.js"})
 
 
 def shared_courses(request: HttpRequest) -> HttpResponse:

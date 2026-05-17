@@ -12,6 +12,7 @@ urlpatterns = [
     path("student/profile/", views.student_profile, name="student_profile"),
     path("student/attendance/", views.student_attendance, name="student_attendance"),
     path("student/exams/", views.student_exams, name="student_exams"),
+    path("student/grade-sheet/", views.student_grade_sheet, name="student_grade_sheet"),
     path("student/advising/", views.student_advising, name="student_advising"),
     # Teacher
     path("teacher/dashboard/", views.teacher_dashboard, name="teacher_dashboard"),
@@ -21,6 +22,7 @@ urlpatterns = [
     path("admin-panel/dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("admin-panel/users/", views.admin_users, name="admin_users"),
     path("admin-panel/departments/", views.admin_departments, name="admin_departments"),
+    path("admin-panel/courses/", views.admin_courses, name="admin_courses"),
     # Shared
     path("courses/", views.shared_courses, name="shared_courses"),
     path("notices/", views.shared_notices, name="shared_notices"),

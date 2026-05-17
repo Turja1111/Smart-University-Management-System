@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Grade Sheet — SUMS{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{% static 'css/grade-sheet.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+  <!-- Page Header -->
+  <div class="section-header mb-6">
+    <div>
+      <div class="section-title">📊 Grade Sheet</div>
+      <div class="section-subtitle">Your academic performance across all enrolled courses</div>
+    </div>
+    <div class="gs-action-buttons">
+      <button class="btn btn-secondary" id="btn-preview-pdf">
+        <span>👁️</span> Preview
+      </button>
+      <button class="btn btn-primary" id="btn-download-pdf">
+        <span>☁️</span> Download
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="gs-loading" class="gs-loading-wrap">
+    <div class="spinner"></div>
+    <p>Loading your grade sheet…</p>
+  </div>
+
+  <!-- Main Content (hidden until loaded) -->
+  <div id="gs-content" class="hidden">
+
+    <!-- Top Row: Student Info Card + Summary Stats -->
+    <div class="gs-top-row">
+
+      <!-- Student Info Card -->
+      <div class="glass-card gs-info-card">
+        <div class="glass-card-inner">
+          <div class="gs-info-header">
+            <div class="gs-avatar" id="gs-avatar-initials">S</div>
+            <div>
+              <div class="gs-info-title" id="gs-student-name">—</div>
+              <div class="gs-info-sub" id="gs-student-id">—</div>
+            </div>
+          </div>
+          <div class="gs-info-grid">
+            <div class="gs-info-row">
+              <span class="gs-info-label">Department</span>
+              <span class="gs-info-value" id="gs-department">—</span>
+            </div>
+            <div class="gs-info-row">
+              <span class="gs-info-label">Program</span>
+              <span class="gs-info-value" id="gs-program">—</span>
+            </div>
+            <div class="gs-info-row">
+              <span class="gs-info-label">Current Semester</span>
+              <span class="gs-info-value" id="gs-semester">—</span>
+            </div>
+            <div class="gs-info-row">
+              <span class="gs-info-label">Batch</span>
+              <span class="gs-info-value" id="gs-batch">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="gs-stats-col">
+        <div class="glass-card gs-stat-card">
+          <div class="glass-card-inner">
+            <div class="gs-stat-icon gs-stat-icon-violet">📈</div>
+            <div class="gs-stat-val" id="gs-cgpa">0.00</div>
+            <div class="gs-stat-label">Cumulative GPA</div>
+          </div>
+        </div>
+        <div class="glass-card gs-stat-card">
+          <div class="glass-card-inner">
+            <div class="gs-stat-icon gs-stat-icon-blue">📚</div>
+            <div class="gs-stat-val" id="gs-total-courses">0</div>
+            <div class="gs-stat-label">Courses Graded</div>
+          </div>
+        </div>
+        <div class="glass-card gs-stat-card">
+          <div class="glass-card-inner">
+            <div class="gs-stat-icon gs-stat-icon-emerald">🎯</div>
+            <div class="gs-stat-val" id="gs-credits">0</div>
+            <div class="gs-stat-label">Total Credits</div>
+          </div>
+        </div>
+        <div class="glass-card gs-stat-card">
+          <div class="glass-card-inner">
+            <div class="gs-stat-icon gs-stat-icon-amber">⭐</div>
+            <div class="gs-stat-val" id="gs-best-grade">—</div>
+            <div class="gs-stat-label">Best Grade</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="gs-empty" class="gs-empty hidden">
+      <div class="gs-empty-icon">📭</div>
+      <div class="gs-empty-title">No grades yet</div>
+      <div class="gs-empty-sub">Your grades will appear here once your courses are graded.</div>
+    </div>
+
+    <!-- Grade Table -->
+    <div id="gs-table-wrap" class="glass-card mt-6">
+      <div class="gs-table-header">
+        <div class="section-title">📋 Course Grades</div>
+        <div class="gs-semester-filter" id="gs-semester-tabs"></div>
+      </div>
+      <div class="table-wrapper">
+        <table id="gs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Semester</th>
+              <th>Marks</th>
+              <th>%</th>
+              <th>Grade</th>
+              <th>Grade Points</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="gs-tbody">
+            <tr><td colspan="9" class="table-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /gs-content -->
+
+  <!-- PDF Preview Modal Overlay (custom) -->
+  <div id="gs-preview-overlay" class="gs-preview-overlay hidden">
+    <div class="gs-preview-modal">
+      <div class="gs-preview-header">
+        <span>📄 Grade Sheet Preview</span>
+        <button class="gs-preview-close" id="gs-preview-close">✕</button>
+      </div>
+      <div class="gs-preview-body" id="gs-preview-body">
+        <!-- PDF preview table rendered here -->
+      </div>
+      <div class="gs-preview-footer">
+        <button class="btn btn-secondary" id="gs-preview-cancel">Close</button>
+        <button class="btn btn-primary" id="gs-preview-download">☁️ Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

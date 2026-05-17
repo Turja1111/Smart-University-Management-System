@@ -79,7 +79,10 @@ export const api = {
     analytics: (id) => api.get(`/teachers/exam-analytics/${id}/`),
   },
   courses: {
-    list: () => api.get("/courses/courses/"),
+    list: (qs = "") => api.get(`/courses/courses/${qs}`),
+    create: (d) => api.post("/courses/courses/", d),
+    update: (id, d) => api.patch(`/courses/courses/${id}/`, d),
+    delete: (id) => api.delete(`/courses/courses/${id}/`),
     departments: () => api.get("/courses/departments/"),
     enroll: (courseId) => api.post("/courses/enrollments/", { course: courseId }),
     assignments: () => api.get("/courses/assignments/"),

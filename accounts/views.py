@@ -138,6 +138,29 @@ class AdminUserViewSet(viewsets.ModelViewSet):
     filterset_fields = ['role', 'is_active', 'is_verified']
     search_fields = ['email', 'first_name', 'last_name', 'username']
 
+    def perform_create(self, serializer):
+        user = serializer.save()
+        password = self.request.data.get('password')
+        if password:
+            user.set_password(password)
+        else:
+            user.set_password('sums1234')  # Default password
+        user.save()
+        AuditLog.objects.create(
+            user=self.request.user,
+            action=AuditLog.Action.CREATE,
+            resource='User',
+            resource_id=str(user.id),
+            description=f'Admin created user: {user.email}',
+        )
+
+    def perform_update(self, serializer):
+        user = serializer.save()
+        password = self.request.data.get('password')
+        if password:
+            user.set_password(password)
+            user.save()
+
     def perform_destroy(self, instance):
         AuditLog.objects.create(
             user=self.request.user,

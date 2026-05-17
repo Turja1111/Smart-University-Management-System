@@ -5,12 +5,107 @@
 
 {% block page_css %}
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+  <style>
+    .admin-directory {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-6);
+    }
+    
+    .admin-app-group {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      box-shadow: var(--glass-shadow);
+    }
+    
+    .admin-app-header {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 14px 20px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+    }
+    
+    .admin-model-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-glass);
+      transition: background var(--transition-fast);
+    }
+    
+    .admin-model-row:last-child {
+      border-bottom: none;
+    }
+    
+    .admin-model-row:hover {
+      background: var(--bg-glass-hover);
+    }
+    
+    .admin-model-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+    
+    .admin-model-name:hover {
+      color: var(--accent-violet);
+    }
+    
+    .admin-actions {
+      display: flex;
+      gap: var(--s-3);
+    }
+    
+    .admin-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--r-sm);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-add {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .btn-add:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+    
+    .btn-change {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .btn-change:hover {
+      background: rgba(59, 130, 246, 0.25);
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-  <div class="hero-banner anim-slideUp">
-    <h2>🛡️ System Overview</h2>
-    <p>Users, security signals, and audit logs.</p>
+  <div class="hero-banner anim-slideUp mb-6">
+    <h2>🛡️ System Administration</h2>
+    <p>Manage users, courses, grades, and monitor system security.</p>
     <div class="hero-stats">
       <div class="hero-stat">
         <div class="hero-stat-value" id="a-total-users">0</div>
@@ -24,34 +119,137 @@
         <div class="hero-stat-value" id="a-audits">0</div>
         <div class="hero-stat-label">Audit Logs</div>
       </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" id="a-reports">0</div>
+        <div class="hero-stat-label">Pending Reviews</div>
+      </div>
     </div>
   </div>
 
-  <div class="grid-2">
-    <div class="glass-card">
-      <div class="glass-card-inner">
-        <div class="section-title">👥 User Management</div>
-        <div class="section-subtitle">Quick view</div>
-        <div class="table-wrapper mt-4">
-          <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-            <tbody id="a-users-tbody"><tr><td colspan="3" class="table-empty">Loading…</td></tr></tbody>
-          </table>
+  <div class="admin-directory stagger">
+    
+    <!-- ACCOUNTS -->
+    <div class="admin-app-group">
+      <div class="admin-app-header">
+        <span style="color:var(--accent-blue)">👤</span> Accounts & Security
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/accounts/auditlog/" class="admin-model-name">Audit Logs</a>
+        <div class="admin-actions">
+          <a href="/admin/accounts/auditlog/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/accounts/loginanomaly/" class="admin-model-name">Login Anomalies</a>
+        <div class="admin-actions">
+          <a href="/admin/accounts/loginanomaly/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/accounts/loginanomaly/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin-panel/users/" class="admin-model-name">Users <span class="badge badge-emerald" style="margin-left:8px;font-size:0.6rem">Custom UI</span></a>
+        <div class="admin-actions">
+          <a href="/admin-panel/users/" class="admin-action-btn btn-change">✏️ Manage</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/students/studentprofile/" class="admin-model-name">Student Profiles</a>
+        <div class="admin-actions">
+          <a href="/admin/students/studentprofile/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/students/studentprofile/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/teachers/teacherprofile/" class="admin-model-name">Teacher Profiles</a>
+        <div class="admin-actions">
+          <a href="/admin/teachers/teacherprofile/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/teachers/teacherprofile/" class="admin-action-btn btn-change">✏️ Change</a>
         </div>
       </div>
     </div>
-    <div class="glass-card">
-      <div class="glass-card-inner">
-        <div class="section-title">📜 Audit Logs</div>
-        <div class="section-subtitle">Recent actions</div>
-        <div class="table-wrapper mt-4">
-          <table>
-            <thead><tr><th>Time</th><th>User</th><th>Action</th></tr></thead>
-            <tbody id="a-audit-tbody"><tr><td colspan="3" class="table-empty">Loading…</td></tr></tbody>
-          </table>
+
+    <!-- ATTENDANCE -->
+    <div class="admin-app-group">
+      <div class="admin-app-header">
+        <span style="color:var(--accent-emerald)">📅</span> Attendance
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/attendance/attendancerecord/" class="admin-model-name">Attendance Records</a>
+        <div class="admin-actions">
+          <a href="/admin/attendance/attendancerecord/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/attendance/attendancerecord/" class="admin-action-btn btn-change">✏️ Change</a>
         </div>
       </div>
     </div>
+
+    <!-- COURSES -->
+    <div class="admin-app-group">
+      <div class="admin-app-header">
+        <span style="color:var(--accent-amber)">📚</span> Courses
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/courses/department/" class="admin-model-name">Departments</a>
+        <div class="admin-actions">
+          <a href="/admin/courses/department/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/courses/department/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin-panel/courses/" class="admin-model-name">Courses <span class="badge badge-emerald" style="margin-left:8px;font-size:0.6rem">Custom UI</span></a>
+        <div class="admin-actions">
+          <a href="/admin-panel/courses/" class="admin-action-btn btn-change">✏️ Manage</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/courses/enrollment/" class="admin-model-name">Enrollments</a>
+        <div class="admin-actions">
+          <a href="/admin/courses/enrollment/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/courses/enrollment/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/courses/assignment/" class="admin-model-name">Assignments</a>
+        <div class="admin-actions">
+          <a href="/admin/courses/assignment/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/courses/assignment/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/courses/assignmentsubmission/" class="admin-model-name">Assignment Submissions</a>
+        <div class="admin-actions">
+          <a href="/admin/courses/assignmentsubmission/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/courses/assignmentsubmission/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMS -->
+    <div class="admin-app-group">
+      <div class="admin-app-header">
+        <span style="color:var(--accent-violet)">📊</span> Exams
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/exams/examresult/" class="admin-model-name">Exam Results</a>
+        <div class="admin-actions">
+          <a href="/admin/exams/examresult/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/exams/examresult/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="admin-app-group">
+      <div class="admin-app-header">
+        <span style="color:var(--accent-red)">📢</span> Notifications
+      </div>
+      <div class="admin-model-row">
+        <a href="/admin/notifications/notice/" class="admin-model-name">Notices</a>
+        <div class="admin-actions">
+          <a href="/admin/notifications/notice/add/" class="admin-action-btn btn-add">➕ Add</a>
+          <a href="/admin/notifications/notice/" class="admin-action-btn btn-change">✏️ Change</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 {% endblock %}
-

@@ -7,7 +7,7 @@ const NAV = {
     { icon: "📚", label: "Courses", href: "/courses/" },
     { icon: "📅", label: "Attendance", href: "/student/attendance/" },
     { icon: "🧠", label: "Advising", href: "/student/advising/" },
-    { icon: "📊", label: "Results", href: "/student/exams/" },
+    { icon: "📊", label: "Grade Sheet", href: "/student/grade-sheet/" },
     { icon: "📢", label: "Notices", href: "/notices/" },
     { icon: "🤖", label: "AI Tools", href: "/ai/" },
   ],
