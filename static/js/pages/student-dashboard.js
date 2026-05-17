@@ -1,5 +1,5 @@
 import { api, ensureMeLoaded } from "../api.js";
-import { getDisplayName } from "../auth.js";
+import { getDisplayName, isVerified } from "../auth.js";
 import { toast } from "../toast.js";
 import { countUp } from "../utils.js";
 import { makeDoughnutChart, makeLineChart } from "../charts.js";
@@ -68,6 +68,10 @@ function animateCounts() {
 
 async function render() {
   try {
+    // Show unverified banner immediately (before API calls)
+    const banner = document.getElementById("unverified-banner");
+    if (banner && !isVerified()) banner.style.display = "block";
+
     await ensureMeLoaded();
     const [profile, cgpa, routineRes, assignments, attendance] = await Promise.all([
       api.students.profile(),

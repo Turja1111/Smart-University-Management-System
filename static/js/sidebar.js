@@ -1,4 +1,5 @@
-import { getDisplayName, getInitials, getRole, isLoggedIn, logout } from "./auth.js";
+import { getDisplayName, getInitials, getRole, isLoggedIn, isVerified, renderNameWithBadge, logout, setUser } from "./auth.js?v=10";
+import { api } from "./api.js?v=10";
 
 const NAV = {
   student: [
@@ -23,7 +24,7 @@ const NAV = {
     { icon: "🏠", label: "Dashboard", href: "/admin-panel/dashboard/" },
     { icon: "👥", label: "Users", href: "/admin-panel/users/" },
     { icon: "🏛️", label: "Departments", href: "/admin-panel/departments/" },
-    { icon: "📚", label: "Courses", href: "/courses/" },
+    { icon: "📚", label: "Courses", href: "/admin-panel/courses/" },
     { icon: "📢", label: "Notices", href: "/notices/" },
     { icon: "🤖", label: "AI Tools", href: "/ai/" },
   ],
@@ -33,21 +34,19 @@ function activePath() {
   return window.location.pathname;
 }
 
-export function initSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  if (!sidebar) return;
+function renderNav(role, verified) {
+  let links = NAV[role] || NAV.student;
 
-  // Hide shell on auth pages
-  if (window.location.pathname === "/login/" || window.location.pathname === "/register/") return;
-
-  // If not logged in, kick to login
-  if (!isLoggedIn()) {
-    window.location.href = "/login/";
-    return;
+  // Apply feature restrictions for unverified users (admins are always unrestricted)
+  if (!verified && role !== "admin") {
+    const restrictedLabels = {
+      student: ["Advising", "Attendance", "Grade Sheet"],
+      teacher: ["Attendance", "Grades"],
+    };
+    const toHide = restrictedLabels[role] || [];
+    links = links.filter((l) => !toHide.includes(l.label));
   }
 
-  const role = getRole() || "student";
-  const links = NAV[role] || NAV.student;
   const itemsHost = document.getElementById("nav-items");
   if (itemsHost) {
     itemsHost.innerHTML = links
@@ -66,18 +65,72 @@ export function initSidebar() {
       })
       .join("");
   }
+}
 
-  document.getElementById("sidebar-avatar").textContent = getInitials();
-  document.getElementById("sidebar-user-name").textContent = getDisplayName();
+function renderUserInfo(role, verified) {
+  const avatar = document.getElementById("sidebar-avatar");
+  if (avatar) avatar.textContent = getInitials();
+
+  const nameEl = document.getElementById("sidebar-user-name");
+  if (nameEl) nameEl.innerHTML = renderNameWithBadge(getDisplayName(), verified);
+
   const badge = document.getElementById("sidebar-role-badge");
   if (badge) {
     badge.className = `role-badge ${role}`;
     badge.textContent = role;
   }
+}
 
+export async function initSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (!sidebar) return;
+
+  // Skip on auth pages
+  if (window.location.pathname === "/login/" || window.location.pathname === "/register/") return;
+
+  // If no token at all, kick to login
+  if (!isLoggedIn()) {
+    window.location.href = "/login/";
+    return;
+  }
+
+  // 1. Render immediately from whatever is cached (fast path)
+  const cachedRole = getRole() || "student";
+  const cachedVerified = isVerified();
+  renderNav(cachedRole, cachedVerified);
+  renderUserInfo(cachedRole, cachedVerified);
   document.getElementById("sidebar-logout-btn")?.addEventListener("click", logout);
+
+  // 2. Fetch fresh user data in background and re-render to fix any stale cache
+  try {
+    const me = await api.auth.me();
+    if (me) {
+      setUser(me);
+      const freshRole = me.role || "student";
+      const freshVerified = me.is_verified === true;
+
+      // Re-render nav with accurate role
+      renderNav(freshRole, freshVerified);
+      renderUserInfo(freshRole, freshVerified);
+
+      // If cached role was wrong (e.g. stale student token for an admin),
+      // redirect to the correct dashboard
+      if (cachedRole !== freshRole) {
+        const dashboards = {
+          admin: "/admin-panel/dashboard/",
+          teacher: "/teacher/dashboard/",
+          student: "/student/dashboard/",
+        };
+        const correct = dashboards[freshRole];
+        if (correct && !window.location.pathname.startsWith(correct.replace(/\/$/, ""))) {
+          window.location.href = correct;
+        }
+      }
+    }
+  } catch (_) {
+    // If refresh fails silently (network), leave the cached render in place
+  }
 }
 
 // Auto-init
 initSidebar();
-

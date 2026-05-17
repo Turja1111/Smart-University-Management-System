@@ -32,10 +32,13 @@ async function loadUsers() {
     tbody.innerHTML = users.map(u => {
       const roleBadge = u.role === "admin" ? "badge-red" : u.role === "teacher" ? "badge-blue" : "badge-violet";
       const dt = new Date(u.date_joined).toLocaleDateString();
+      const verifiedBadge = u.is_verified
+        ? `<svg title="Verified" style="display:inline;vertical-align:middle;color:#3b82f6;margin-left:4px;" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
+        : `<span title="Pending verification" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-left:6px;vertical-align:middle;"></span>`;
       return `
         <tr>
           <td>
-            <div style="font-weight:600; color:var(--text-primary)">${esc(u.full_name)}</div>
+            <div style="font-weight:600; color:var(--text-primary); display:flex; align-items:center;">${esc(u.full_name)}${verifiedBadge}</div>
             <div style="font-size:0.75rem; color:var(--text-muted)">@${esc(u.username)}</div>
           </td>
           <td>${esc(u.email)}</td>
@@ -98,10 +101,34 @@ function openModal(id = null) {
         </select>
       </div>
       <div>
-        <label class="form-label">Password ${isEdit ? '(leave blank to keep)' : ''}</label>
-        <input type="password" id="m-pw" class="form-control" placeholder="${isEdit ? '***' : 'sums1234'}" />
+        <label class="form-label">New Password <span style="color:var(--text-muted);font-weight:400;">(leave blank to keep current)</span></label>
+        <input type="password" id="m-pw" class="form-control"
+          autocomplete="new-password"
+          placeholder="" />
       </div>
     </div>
+    ${isEdit ? `
+    <div class="form-group" style="padding:14px 16px; border-radius:12px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); margin-top:4px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-weight:600; color:var(--text-primary); font-size:0.9rem;">✅ Account Verified (Blue Tick)</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Grants full feature access. Blue tick will appear next to their name.</div>
+        </div>
+        <div id="verified-toggle-track" style="
+          position:relative; width:48px; height:26px; flex-shrink:0; margin-left:16px;
+          background:${user?.is_verified ? '#3b82f6' : 'rgba(255,255,255,0.15)'};
+          border-radius:34px; cursor:pointer; transition:background 0.25s;
+        ">
+          <div id="verified-toggle-thumb" style="
+            position:absolute; height:20px; width:20px;
+            left:${user?.is_verified ? '24px' : '4px'}; top:3px;
+            background:white; border-radius:50%; transition:left 0.25s;
+          "></div>
+          <input type="checkbox" id="m-verified" ${user?.is_verified ? 'checked' : ''}
+            style="position:absolute;opacity:0;width:0;height:0;" />
+        </div>
+      </div>
+    </div>` : ''}
   `;
 
   show({
@@ -113,7 +140,22 @@ function openModal(id = null) {
     `
   });
 
+  // Wire up the interactive toggle AFTER the modal is in the DOM
+  if (isEdit) {
+    const track = document.getElementById("verified-toggle-track");
+    const thumb = document.getElementById("verified-toggle-thumb");
+    const checkbox = document.getElementById("m-verified");
+    if (track && thumb && checkbox) {
+      track.addEventListener("click", () => {
+        checkbox.checked = !checkbox.checked;
+        track.style.background = checkbox.checked ? "#3b82f6" : "rgba(255,255,255,0.15)";
+        thumb.style.left = checkbox.checked ? "24px" : "4px";
+      });
+    }
+  }
+
   document.getElementById("m-cancel").addEventListener("click", hide);
+
   document.getElementById("m-save").addEventListener("click", async () => {
     const payload = {
       first_name: document.getElementById("m-fn").value,
@@ -124,6 +166,8 @@ function openModal(id = null) {
 
     try {
       if (isEdit) {
+        const vEl = document.getElementById("m-verified");
+        if (vEl !== null) payload.is_verified = vEl.checked;
         await api.admin.updateUser(id, payload);
         toast.success("Updated", "User profile saved.");
       } else {
@@ -142,12 +186,14 @@ function openModal(id = null) {
 }
 
 async function init() {
+  try {
+    await ensureMeLoaded(); // load fresh user first
+  } catch (_) {}
   const role = getRole();
   if (role !== "admin") {
     window.location.href = "/login/";
     return;
   }
-  await ensureMeLoaded();
   
   document.getElementById("search-users").addEventListener("input", () => loadUsers());
   document.getElementById("filter-role").addEventListener("change", () => loadUsers());

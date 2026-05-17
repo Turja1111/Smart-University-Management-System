@@ -44,6 +44,10 @@ export function isLoggedIn() {
   return !!getToken();
 }
 
+export function isVerified() {
+  return getUser()?.is_verified === true;
+}
+
 export function logout() {
   clearTokens();
   localStorage.removeItem(USER_KEY);
@@ -68,5 +72,10 @@ export function getDisplayName() {
   if (!user) return "User";
   const full = `${user.first_name || ""} ${user.last_name || ""}`.trim();
   return full || user.email || "User";
+}
+
+export function renderNameWithBadge(name, verified) {
+  if (!verified) return name;
+  return `${name} <svg style="display:inline-block; vertical-align:middle; margin-left:4px; color:#3b82f6;" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
 }
 

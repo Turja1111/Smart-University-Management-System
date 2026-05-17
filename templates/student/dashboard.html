@@ -9,6 +9,17 @@
 {% endblock %}
 
 {% block content %}
+  <!-- Unverified warning banner (shown by JS if unverified) -->
+  <div id="unverified-banner" style="display:none; margin-bottom:1.5rem; padding:16px 24px; border-radius:14px; background:linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.12)); border:1px solid rgba(245,158,11,0.35); color:var(--text-primary);">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:1.5rem;">⏳</span>
+      <div>
+        <div style="font-weight:700; font-size:1rem; color:#f59e0b;">Account Pending Verification</div>
+        <div style="font-size:0.875rem; color:var(--text-muted); margin-top:2px;">Your account has not been verified by an admin yet. Some features are restricted. Please contact your administrator.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="hero-banner anim-slideUp" id="student-hero">
     <h2 id="hero-title">Welcome back! 🎓</h2>
     <p>Here's your academic overview for today.</p>

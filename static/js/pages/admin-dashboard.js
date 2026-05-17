@@ -1,39 +1,43 @@
 import { api, ensureMeLoaded } from "../api.js";
-import { getRole, getUser } from "../auth.js";
+import { getRole } from "../auth.js";
 import { toast } from "../toast.js";
 import { countUp } from "../utils.js";
 
 async function main() {
-  const role = getRole();
-  if (role === "student") {
-    window.location.href = "/student/dashboard/";
-    return;
-  }
-  if (role === "teacher") {
-    window.location.href = "/teacher/dashboard/";
-    return;
-  }
-  if (role !== "admin") {
-    window.location.href = "/login/";
-    return;
-  }
-
   try {
+    // Always load fresh user data FIRST before checking role
     await ensureMeLoaded();
-    const [users, anomalies, audits] = await Promise.all([
+
+    const role = getRole();
+    if (role === "student") {
+      window.location.href = "/student/dashboard/";
+      return;
+    }
+    if (role === "teacher") {
+      window.location.href = "/teacher/dashboard/";
+      return;
+    }
+    if (role !== "admin") {
+      window.location.href = "/login/";
+      return;
+    }
+
+    // Load stats concurrently — wrap each so one failure doesn't block others
+    const [users, anomalies, audits] = await Promise.allSettled([
       api.admin.users(),
       api.admin.anomalies(),
-      api.admin.auditLogs()
+      api.admin.auditLogs(),
     ]);
 
-    // Animate stats
-    const totalUsers = users?.results?.length || users?.length || 0;
-    const totalAnomalies = anomalies?.results?.length || anomalies?.length || 0;
-    const totalAudits = audits?.results?.length || audits?.length || 0;
+    const userList   = users.value?.results   ?? users.value   ?? [];
+    const anomList   = anomalies.value?.results ?? anomalies.value ?? [];
+    const auditList  = audits.value?.results   ?? audits.value  ?? [];
 
-    countUp(document.getElementById("a-total-users"), totalUsers, 1000);
-    countUp(document.getElementById("a-anomalies"), totalAnomalies, 1000);
-    countUp(document.getElementById("a-audits"), totalAudits, 1000);
+    const statEl = (id) => document.getElementById(id);
+    if (statEl("a-total-users"))  countUp(statEl("a-total-users"),  userList.length,  1000);
+    if (statEl("a-anomalies"))    countUp(statEl("a-anomalies"),    anomList.length,  1000);
+    if (statEl("a-audits"))       countUp(statEl("a-audits"),       auditList.length, 1000);
+    if (statEl("a-reports"))      countUp(statEl("a-reports"),      anomList.filter(a => !a.resolved).length, 1000);
 
   } catch (e) {
     toast.error("Dashboard error", e.message || "Failed to load system stats");

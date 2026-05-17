@@ -177,12 +177,12 @@ function openModal(id = null) {
 }
 
 async function init() {
+  try { await ensureMeLoaded(); } catch (_) {}
   const role = getRole();
   if (role !== "admin") {
     window.location.href = "/login/";
     return;
   }
-  await ensureMeLoaded();
   
   document.getElementById("search-courses").addEventListener("input", () => loadCourses());
   document.getElementById("btn-add-course").addEventListener("click", () => openModal());
