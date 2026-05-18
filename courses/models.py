@@ -87,6 +87,35 @@ class Enrollment(models.Model):
         return f"{self.student.get_full_name()} → {self.course.code}"
 
 
+class AdvisingConfirmation(models.Model):
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='advising_confirmations'
+    )
+    semester = models.CharField(max_length=10, choices=Course.Semester.choices)
+    year = models.PositiveIntegerField()
+
+    student_confirmed = models.BooleanField(default=False)
+    student_confirmed_at = models.DateTimeField(null=True, blank=True)
+
+    teacher_approved = models.BooleanField(default=False)
+    teacher_approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_advisings',
+        limit_choices_to={'role': 'teacher'}
+    )
+
+    courses_snapshot = models.JSONField(default=list, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['student', 'semester', 'year']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Advising {self.student.get_full_name()} {self.semester} {self.year}"
+
+
 class Assignment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
     title = models.CharField(max_length=300)

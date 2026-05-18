@@ -58,6 +58,14 @@ def student_advising(request: HttpRequest) -> HttpResponse:
     )
 
 
+def student_enrollments(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "student/enrollments.html",
+        {"page_js": "js/pages/student-enrollments.js"},
+    )
+
+
 def teacher_dashboard(request: HttpRequest) -> HttpResponse:
     return render(
         request,

@@ -9,11 +9,13 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Department, Course, Enrollment, Assignment, AssignmentSubmission
+from .models import AdvisingConfirmation
 from .schedule_utils import intervals_overlap, iter_conflict_intervals
 from .serializers import (
     DepartmentSerializer, CourseSerializer, EnrollmentSerializer,
     AssignmentSerializer, AssignmentSubmissionSerializer
 )
+from .serializers import AdvisingConfirmationSerializer
 from accounts.permissions import IsAdmin, IsAdminOrTeacher, IsTeacher, IsStudent
 
 
@@ -113,6 +115,14 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
             course = Course.objects.get(id=course_id, is_active=True)
         except Course.DoesNotExist:
             return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
+        # Prevent changes once student has confirmed advising for this semester/year
+        if not request.user.is_admin and getattr(request.user, 'is_student', False):
+            try:
+                conf = AdvisingConfirmation.objects.get(student=request.user, semester=course.semester, year=course.year)
+                if conf.student_confirmed and not conf.teacher_approved:
+                    return Response({'error': 'Advising already confirmed by student. Cannot change courses until teacher approval.'}, status=status.HTTP_400_BAD_REQUEST)
+            except AdvisingConfirmation.DoesNotExist:
+                pass
         if course.is_full:
             return Response({'error': 'Course is full.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -125,10 +135,72 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         enrollment = self.get_object()
         if not request.user.is_admin and enrollment.student != request.user:
             return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        # Prevent dropping if student has confirmed advising for this semester/year
+        try:
+            course = enrollment.course
+            conf = AdvisingConfirmation.objects.get(student=enrollment.student, semester=course.semester, year=course.year)
+            if conf.student_confirmed and not conf.teacher_approved and enrollment.student == request.user:
+                return Response({'error': 'Advising already confirmed by student. Cannot change courses until teacher approval.'}, status=status.HTTP_400_BAD_REQUEST)
+        except AdvisingConfirmation.DoesNotExist:
+            pass
+
         enrollment.status = 'dropped'
         enrollment.dropped_at = tz.now()
         enrollment.save()
         return Response({'message': 'Course dropped successfully.'})
+
+
+class AdvisingConfirmationViewSet(viewsets.ModelViewSet):
+    serializer_class = AdvisingConfirmationSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_admin:
+            return AdvisingConfirmation.objects.all().select_related('student', 'approved_by')
+        if user.is_teacher:
+            # Teachers can view confirmations for students in their courses (simple approach: all)
+            return AdvisingConfirmation.objects.all().select_related('student', 'approved_by')
+        return AdvisingConfirmation.objects.filter(student=user).select_related('approved_by')
+
+    def get_permissions(self):
+        from accounts.permissions import IsAdminOrTeacher, IsTeacher, IsStudent
+        if self.action in ['create']:
+            return [IsStudent()]
+        if self.action in ['approve']:
+            return [IsTeacher()]
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        # Student confirming their advising for a semester/year
+        semester = request.data.get('semester')
+        year = request.data.get('year')
+        if not semester or not year:
+            return Response({'error': 'semester and year required.'}, status=status.HTTP_400_BAD_REQUEST)
+        obj, created = AdvisingConfirmation.objects.get_or_create(student=request.user, semester=semester, year=year)
+        if obj.student_confirmed:
+            return Response(AdvisingConfirmationSerializer(obj).data, status=status.HTTP_200_OK)
+        obj.student_confirmed = True
+        obj.student_confirmed_at = tz.now()
+        obj.save()
+        return Response(AdvisingConfirmationSerializer(obj).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminOrTeacher])
+    def approve(self, request, pk=None):
+        # Teacher approves student's advising and snapshot courses
+        try:
+            obj = self.get_object()
+        except Exception:
+            return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if obj.teacher_approved:
+            return Response(AdvisingConfirmationSerializer(obj).data)
+        # snapshot current enrolled course ids for the student for this semester/year
+        enrollments = Enrollment.objects.filter(student=obj.student, status='enrolled', course__semester=obj.semester, course__year=obj.year)
+        obj.courses_snapshot = list(enrollments.values_list('course_id', flat=True))
+        obj.teacher_approved = True
+        obj.teacher_approved_at = tz.now()
+        obj.approved_by = request.user
+        obj.save()
+        return Response(AdvisingConfirmationSerializer(obj).data)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):

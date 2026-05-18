@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register('departments', views.DepartmentViewSet, basename='departments')
 router.register('courses', views.CourseViewSet, basename='courses')
 router.register('enrollments', views.EnrollmentViewSet, basename='enrollments')
+router.register('advisings', views.AdvisingConfirmationViewSet, basename='advisings')
 router.register('assignments', views.AssignmentViewSet, basename='assignments')
 router.register('submissions', views.AssignmentSubmissionViewSet, basename='submissions')
 

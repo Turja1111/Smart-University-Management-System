@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, Course, Enrollment, Assignment, AssignmentSubmission
+from .models import Department, Course, Enrollment, Assignment, AssignmentSubmission, AdvisingConfirmation
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -98,3 +98,22 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
 
     def get_assignment_title(self, obj):
         return obj.assignment.title
+
+
+class AdvisingConfirmationSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    approved_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AdvisingConfirmation
+        fields = ['id', 'student', 'student_name', 'semester', 'year',
+                  'student_confirmed', 'student_confirmed_at',
+                  'teacher_approved', 'teacher_approved_at', 'approved_by', 'approved_by_name',
+                  'courses_snapshot', 'created_at']
+        read_only_fields = ['student_confirmed_at', 'teacher_approved_at', 'created_at', 'courses_snapshot']
+
+    def get_student_name(self, obj):
+        return obj.student.get_full_name()
+
+    def get_approved_by_name(self, obj):
+        return obj.approved_by.get_full_name() if obj.approved_by else None

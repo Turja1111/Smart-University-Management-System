@@ -3,6 +3,7 @@ import { toast } from "../toast.js";
 
 let availableCourses = [];
 let enrolledCourses = []; // [{ enrollmentId, course }]
+let advisingStatus = null;
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -252,6 +253,35 @@ function renderAvailable() {
 function render() {
   renderAvailable();
   renderGrid();
+  updateAdvisingDisplay();
+}
+
+function updateAdvisingDisplay() {
+  const statusText = document.getElementById('advising-status-text');
+  const teacherText = document.getElementById('advising-teacher-text');
+  const btn = document.getElementById('confirm-advising-btn');
+  if (!statusText || !teacherText || !btn) return;
+
+  if (!advisingStatus) {
+    statusText.textContent = 'Not confirmed';
+    teacherText.textContent = '—';
+    btn.disabled = false;
+    return;
+  }
+
+  statusText.textContent = advisingStatus.student_confirmed ? 'Confirmed by student' : 'Not confirmed';
+  teacherText.textContent = advisingStatus.teacher_approved ? `Approved by ${advisingStatus.approved_by_name}` : 'Pending';
+  // If student confirmed and teacher not approved, disable add/drop
+  if (advisingStatus.student_confirmed && !advisingStatus.teacher_approved) {
+    // disable all Add and Remove buttons
+    document.querySelectorAll('[data-enroll]').forEach(b => b.disabled = true);
+    document.querySelectorAll('[data-drop]').forEach(b => b.disabled = true);
+    btn.disabled = true;
+  } else {
+    document.querySelectorAll('[data-enroll]').forEach(b => b.disabled = false);
+    document.querySelectorAll('[data-drop]').forEach(b => b.disabled = false);
+    btn.disabled = false;
+  }
 }
 
 async function init() {
@@ -275,6 +305,26 @@ async function init() {
     const data = await api.get("/courses/courses/?page_size=2000");
     availableCourses = data?.results ?? data ?? [];
     
+    // Fetch advising status for the detected semester/year (if any)
+    try {
+      let sem = null;
+      let yr = null;
+      if (enrolledCourses.length) {
+        sem = enrolledCourses[0].course.semester;
+        yr = enrolledCourses[0].course.year;
+      } else if (availableCourses.length) {
+        sem = availableCourses[0].semester;
+        yr = availableCourses[0].year;
+      }
+      if (sem && yr) {
+        const advList = await api.get(`/courses/advisings/?semester=${sem}&year=${yr}`);
+        const items = advList?.results ?? advList ?? [];
+        advisingStatus = items.length ? items[0] : null;
+      }
+    } catch (e) {
+      console.warn('Failed to load advising status', e);
+    }
+    
     render();
   } catch (e) {
     console.error("Failed to load advising data", e);
@@ -287,3 +337,27 @@ window.enroll = enroll;
 window.drop = drop;
 
 init();
+
+// Confirm advising button handler
+document.addEventListener('click', (ev) => {
+  const el = ev.target;
+  if (el && el.id === 'confirm-advising-btn') {
+    if (!enrolledCourses.length) {
+      toast.error('No courses', 'Select at least one course before confirming.');
+      return;
+    }
+    const sem = enrolledCourses[0].course.semester;
+    const yr = enrolledCourses[0].course.year;
+    if (!confirm('Confirm your advising for the selected courses? You will not be able to change them until teacher approval.')) return;
+    (async () => {
+      try {
+        const res = await api.post('/courses/advisings/', { semester: sem, year: yr });
+        advisingStatus = res;
+        toast.success('Advising confirmed', 'Your advising has been submitted for teacher approval.');
+        render();
+      } catch (e) {
+        toast.error('Confirm failed', e?.data?.error || e.message || 'Try again.');
+      }
+    })();
+  }
+});
