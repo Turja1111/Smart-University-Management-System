@@ -29,10 +29,11 @@ class NoticeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_admin:
             return Notice.objects.all().select_related('created_by', 'department')
-        # Students/Teachers see notices targeted at them or 'all'
+        # Students/Teachers see notices targeted at them specifically, or general notices for their role
+        from django.db.models import Q
         return Notice.objects.filter(
-            is_published=True,
-            target_role__in=['all', user.role]
+            Q(target_user=user) | Q(target_user__isnull=True, target_role__in=['all', user.role]),
+            is_published=True
         ).select_related('created_by', 'department')
 
     def get_permissions(self):

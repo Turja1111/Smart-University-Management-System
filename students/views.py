@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from .models import StudentProfile
 from .serializers import StudentProfileSerializer, StudentProfileUpdateSerializer
-from accounts.permissions import IsAdmin, IsStudent
-from courses.models import Enrollment
+from accounts.permissions import IsAdmin, IsStudent, IsAdminOrTeacher
+from courses.models import Enrollment, AdvisingConfirmation
 from courses.schedule_utils import build_by_day_for_enrollments
 
 
@@ -94,10 +94,41 @@ def cgpa_analytics(request):
 def my_routine(request):
     """Student class schedule/routine"""
     user = request.user
+    student_id = request.query_params.get('student_id')
+
+    if student_id:
+        if not (user.is_admin or user.is_teacher):
+            return Response({'error': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+        from django.contrib.auth import get_user_model
+        try:
+            target_user = get_user_model().objects.get(id=student_id, role='student')
+        except get_user_model().DoesNotExist:
+            return Response({'error': 'Student not found.'}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        if not user.is_student:
+            return Response({'error': 'Student access only.'}, status=status.HTTP_403_FORBIDDEN)
+        target_user = user
+
     enrollments = Enrollment.objects.filter(
-        student=user, status='enrolled'
+        student=target_user, status__in=['enrolled', 'completed']
     ).select_related('course', 'course__teacher', 'course__department')
-    enroll_list = list(enrollments)
+    
+    # Get confirmed advisings for this student
+    confirmed_advisings = AdvisingConfirmation.objects.filter(
+        student=target_user, student_confirmed=True
+    ).values_list('semester', 'year')
+    confirmed_set = set((a[0], a[1]) for a in confirmed_advisings)
+
+    enroll_list = []
+    for e in enrollments:
+        if e.status == 'enrolled':
+            # Only show enrolled courses if their semester is confirmed
+            if (e.course.semester, e.course.year) in confirmed_set:
+                enroll_list.append(e)
+        else:
+            # Completed courses always show up
+            enroll_list.append(e)
+
     routine = []
     for e in enroll_list:
         c = e.course

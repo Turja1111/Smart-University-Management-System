@@ -17,6 +17,7 @@ const NAV = {
     { icon: "🏠", label: "Dashboard", href: "/teacher/dashboard/" },
     { icon: "📚", label: "Courses", href: "/courses/" },
     { icon: "📅", label: "Attendance", href: "/teacher/attendance/" },
+    { icon: "🧾", label: "Advising", href: "/teacher/advising/" },
     { icon: "📝", label: "Grades", href: "/teacher/grades/" },
     { icon: "📢", label: "Notices", href: "/notices/" },
     { icon: "🤖", label: "AI Tools", href: "/ai/" },
@@ -68,6 +69,35 @@ function renderNav(role, verified) {
   }
 }
 
+async function renderCompletedCourses(role) {
+  if (role !== "student") return;
+  const container = document.getElementById("sidebar-completed-courses-container");
+  const itemsHost = document.getElementById("completed-courses-items");
+  if (!container || !itemsHost) return;
+
+  try {
+    const res = await api.courses.myEnrollments();
+    const list = res.results || res || [];
+    const completed = list.filter((e) => e.status === "completed");
+    
+    if (completed.length > 0) {
+      container.style.display = "block";
+      itemsHost.innerHTML = completed
+        .map((e) => {
+          return `
+            <a class="nav-item" href="/courses/" style="font-size: 0.9rem; padding: 8px 16px;">
+              <span class="nav-icon" style="font-size: 1rem;">✅</span>
+              <span class="nav-label">${e.course_code}</span>
+            </a>
+          `;
+        })
+        .join("");
+    }
+  } catch (err) {
+    // silently fail
+  }
+}
+
 function renderUserInfo(role, verified) {
   const avatar = document.getElementById("sidebar-avatar");
   if (avatar) avatar.textContent = getInitials();
@@ -100,6 +130,7 @@ export async function initSidebar() {
   const cachedVerified = isVerified();
   renderNav(cachedRole, cachedVerified);
   renderUserInfo(cachedRole, cachedVerified);
+  renderCompletedCourses(cachedRole);
   document.getElementById("sidebar-logout-btn")?.addEventListener("click", logout);
 
   // 2. Fetch fresh user data in background and re-render to fix any stale cache
@@ -113,6 +144,7 @@ export async function initSidebar() {
       // Re-render nav with accurate role
       renderNav(freshRole, freshVerified);
       renderUserInfo(freshRole, freshVerified);
+      renderCompletedCourses(freshRole);
 
       // If cached role was wrong (e.g. stale student token for an admin),
       // redirect to the correct dashboard

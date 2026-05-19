@@ -18,6 +18,10 @@ class Notice(models.Model):
         'courses.Department', on_delete=models.SET_NULL, null=True, blank=True,
         help_text='Leave blank for university-wide notice'
     )
+    target_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='personal_notices', help_text='For personal notifications'
+    )
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notices')
     is_published = models.BooleanField(default=True)
     is_urgent = models.BooleanField(default=False)

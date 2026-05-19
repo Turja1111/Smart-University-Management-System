@@ -11,6 +11,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Department, Course, Enrollment, Assignment, AssignmentSubmission
 from .models import AdvisingConfirmation
 from .schedule_utils import intervals_overlap, iter_conflict_intervals
+from django.db.models import F
+
 from .serializers import (
     DepartmentSerializer, CourseSerializer, EnrollmentSerializer,
     AssignmentSerializer, AssignmentSubmissionSerializer
@@ -125,10 +127,35 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
                 pass
         if course.is_full:
             return Response({'error': 'Course is full.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Enforce maximum 5 courses per semester rule
+        active_enrollments_count = Enrollment.objects.filter(
+            student=request.user,
+            status=Enrollment.Status.ENROLLED,
+            course__semester=course.semester,
+            course__year=course.year
+        ).count()
+        if active_enrollments_count >= 5:
+            return Response({'error': 'You cannot select more than 5 courses per semester.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If an enrollment record already exists for this student+course,
+        # reactivate it when appropriate instead of creating a duplicate
+        existing = Enrollment.objects.filter(student=request.user, course=course).first()
+        if existing:
+            if existing.status == Enrollment.Status.ENROLLED:
+                return Response({'error': 'Already enrolled in this course.'}, status=status.HTTP_400_BAD_REQUEST)
+            # Reactivate dropped/withdrawn/completed enrollment
+            existing.status = Enrollment.Status.ENROLLED
+            existing.dropped_at = None
+            existing.enrolled_at = tz.now()
+            existing.save()
+            return Response(EnrollmentSerializer(existing).data, status=status.HTTP_200_OK)
+
         try:
             enrollment = Enrollment.objects.create(student=request.user, course=course)
             return Response(EnrollmentSerializer(enrollment).data, status=status.HTTP_201_CREATED)
         except IntegrityError:
+            # Fallback: if race condition occurs, return friendly message
             return Response({'error': 'Already enrolled in this course.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
@@ -157,17 +184,25 @@ class AdvisingConfirmationViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_admin:
             return AdvisingConfirmation.objects.all().select_related('student', 'approved_by')
-        if user.is_teacher:
-            # Teachers can view confirmations for students in their courses (simple approach: all)
+        if user.is_teacher and user.is_verified:
             return AdvisingConfirmation.objects.all().select_related('student', 'approved_by')
+        if user.is_teacher:
+            # Unverified teachers should only see confirmations for students who have enrollments
+            # in this teacher's courses for the same semester and year.
+            return AdvisingConfirmation.objects.filter(
+                student__enrollments__course__teacher=user,
+                student__enrollments__status=Enrollment.Status.ENROLLED,
+                student__enrollments__course__semester=F('semester'),
+                student__enrollments__course__year=F('year')
+            ).select_related('student', 'approved_by').distinct()
         return AdvisingConfirmation.objects.filter(student=user).select_related('approved_by')
 
     def get_permissions(self):
-        from accounts.permissions import IsAdminOrTeacher, IsTeacher, IsStudent
+        from accounts.permissions import IsAdminOrTeacher, IsVerifiedTeacher, IsTeacher, IsStudent
         if self.action in ['create']:
             return [IsStudent()]
         if self.action in ['approve']:
-            return [IsTeacher()]
+            return [IsVerifiedTeacher()]
         return [IsAuthenticated()]
 
     def create(self, request, *args, **kwargs):
@@ -176,15 +211,40 @@ class AdvisingConfirmationViewSet(viewsets.ModelViewSet):
         year = request.data.get('year')
         if not semester or not year:
             return Response({'error': 'semester and year required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Enforce min 3, max 5 courses per semester
+        enrollments = Enrollment.objects.filter(student=request.user, status='enrolled', course__semester=semester, course__year=year)
+        course_count = enrollments.count()
+        if course_count < 3:
+            return Response({'error': 'You must select at least 3 courses per semester to confirm advising.'}, status=status.HTTP_400_BAD_REQUEST)
+        if course_count > 5:
+            return Response({'error': 'You cannot select more than 5 courses per semester.'}, status=status.HTTP_400_BAD_REQUEST)
+
         obj, created = AdvisingConfirmation.objects.get_or_create(student=request.user, semester=semester, year=year)
         if obj.student_confirmed:
             return Response(AdvisingConfirmationSerializer(obj).data, status=status.HTTP_200_OK)
         obj.student_confirmed = True
         obj.student_confirmed_at = tz.now()
+        # Snapshot current enrolled course ids for this student/semester/year so the
+        # advising selection remains stable even if the client state changes later.
+        enrollments = Enrollment.objects.filter(student=request.user, status='enrolled', course__semester=semester, course__year=year)
+        obj.courses_snapshot = list(enrollments.values_list('course_id', flat=True))
         obj.save()
+
+        from notifications.models import Notice
+        teacher_ids = set(Course.objects.filter(id__in=obj.courses_snapshot, teacher__isnull=False).values_list('teacher_id', flat=True))
+        for t_id in teacher_ids:
+            Notice.objects.create(
+                title=f"Advising Request from {request.user.get_full_name()}",
+                content=f"Student {request.user.get_full_name()} has confirmed their advising for {semester} {year}. Please review it.",
+                target_role=Notice.TargetRole.TEACHER,
+                target_user_id=t_id,
+                created_by=request.user
+            )
+
         return Response(AdvisingConfirmationSerializer(obj).data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAdminOrTeacher])
+    @action(detail=True, methods=['post'], permission_classes=[])
     def approve(self, request, pk=None):
         # Teacher approves student's advising and snapshot courses
         try:
@@ -200,6 +260,16 @@ class AdvisingConfirmationViewSet(viewsets.ModelViewSet):
         obj.teacher_approved_at = tz.now()
         obj.approved_by = request.user
         obj.save()
+
+        from notifications.models import Notice
+        Notice.objects.create(
+            title=f"Advising Approved for {obj.semester} {obj.year}",
+            content=f"Your advising request for {obj.semester} {obj.year} has been approved by {request.user.get_full_name()}.",
+            target_role=Notice.TargetRole.STUDENT,
+            target_user=obj.student,
+            created_by=request.user
+        )
+
         return Response(AdvisingConfirmationSerializer(obj).data)
 
 

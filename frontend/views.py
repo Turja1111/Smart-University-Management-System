@@ -90,6 +90,14 @@ def teacher_grades(request: HttpRequest) -> HttpResponse:
     )
 
 
+def teacher_advising(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "teacher/advising.html",
+        {"page_js": "js/pages/teacher-advising.js"},
+    )
+
+
 def admin_dashboard(request: HttpRequest) -> HttpResponse:
     return render(
         request,

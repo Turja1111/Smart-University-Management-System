@@ -20,6 +20,14 @@ class IsTeacher(permissions.BasePermission):
         return bool(request.user and request.user.is_authenticated and request.user.is_teacher)
 
 
+class IsVerifiedTeacher(permissions.BasePermission):
+    """Allow access only to verified teacher users"""
+    message = 'Verified Teacher access required.'
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_teacher and request.user.is_verified)
+
+
 class IsStudent(permissions.BasePermission):
     """Allow access only to student users"""
     message = 'Student access required.'

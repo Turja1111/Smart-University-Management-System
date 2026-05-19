@@ -19,6 +19,7 @@ urlpatterns = [
     path("teacher/dashboard/", views.teacher_dashboard, name="teacher_dashboard"),
     path("teacher/attendance/", views.teacher_attendance, name="teacher_attendance"),
     path("teacher/grades/", views.teacher_grades, name="teacher_grades"),
+    path("teacher/advising/", views.teacher_advising, name="teacher_advising"),
     # Admin
     path("admin-panel/dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("admin-panel/users/", views.admin_users, name="admin_users"),

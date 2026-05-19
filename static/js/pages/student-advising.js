@@ -87,6 +87,11 @@ async function enroll(courseId, btn) {
   const course = availableCourses.find(c => c.id === courseId);
   if (!course) return;
 
+  if (enrolledCourses.length >= 5) {
+    toast.error("Limit Reached", "You cannot select more than 5 courses per semester.");
+    return;
+  }
+
   const conflictCheck = checkConflict(course);
   if (conflictCheck.conflict) {
     toast.error("Schedule Conflict", conflictCheck.message);
@@ -321,6 +326,17 @@ async function init() {
         const items = advList?.results ?? advList ?? [];
         advisingStatus = items.length ? items[0] : null;
       }
+      // If student previously confirmed advising, prefer the snapshot order
+      if (advisingStatus && Array.isArray(advisingStatus.courses_snapshot) && advisingStatus.courses_snapshot.length) {
+        const snapshotOrder = new Map();
+        advisingStatus.courses_snapshot.forEach((cid, idx) => snapshotOrder.set(cid, idx));
+        enrolledCourses.sort((a, b) => {
+          const ai = snapshotOrder.has(a.course.id) ? snapshotOrder.get(a.course.id) : Infinity;
+          const bi = snapshotOrder.has(b.course.id) ? snapshotOrder.get(b.course.id) : Infinity;
+          if (ai === bi) return 0;
+          return ai - bi;
+        });
+      }
     } catch (e) {
       console.warn('Failed to load advising status', e);
     }
@@ -344,6 +360,14 @@ document.addEventListener('click', (ev) => {
   if (el && el.id === 'confirm-advising-btn') {
     if (!enrolledCourses.length) {
       toast.error('No courses', 'Select at least one course before confirming.');
+      return;
+    }
+    if (enrolledCourses.length < 3) {
+      toast.error('Not enough courses', 'You must select at least 3 courses to confirm advising.');
+      return;
+    }
+    if (enrolledCourses.length > 5) {
+      toast.error('Too many courses', 'You cannot select more than 5 courses to confirm advising.');
       return;
     }
     const sem = enrolledCourses[0].course.semester;
