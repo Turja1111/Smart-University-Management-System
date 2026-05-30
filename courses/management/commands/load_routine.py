@@ -73,7 +73,7 @@ class Command(BaseCommand):
         raw = json.loads(path.read_text(encoding='utf-8'))
         sections = raw.get('sections')
         if not sections:
-            self.stderr.write(self.style.ERROR('No "sections" key in JSON. Run parse_routine.py or use a full export.'))
+            self.stderr.write(self.style.ERROR('No "sections" key in JSON. Provide a full routine export.'))
             return
 
         semester = options['semester']
