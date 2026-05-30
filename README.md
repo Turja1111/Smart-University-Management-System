@@ -269,6 +269,146 @@ EMAIL_HOST_PASSWORD=
 
 Redis can be omitted. The production settings run Celery tasks inline when `REDIS_URL` is not set.
 
+## Deployment on PythonAnywhere
+
+PythonAnywhere does not use `Procfile`, `railway.toml`, or Gunicorn. It runs the
+app through the WSGI file linked from the **Web** tab.
+
+This repository includes PythonAnywhere-specific helpers:
+
+- `config/settings/pythonanywhere.py`
+- `pythonanywhere_wsgi.py`
+- `.env.pythonanywhere.example`
+
+### Important database note
+
+New PythonAnywhere free accounts can use SQLite. PostgreSQL on PythonAnywhere
+requires a paid account, and external PostgreSQL connections also require a paid
+account. The `config.settings.pythonanywhere` settings module uses:
+
+1. `DATABASE_URL`, if provided
+2. `DB_NAME`/`DB_USER`/`DB_PASSWORD`/`DB_HOST`/`DB_PORT`, if provided
+3. `db.sqlite3` in the project folder, if no database variables are provided
+
+SQLite is enough for a demo/free deployment, but PostgreSQL is recommended for a
+real production deployment.
+
+### PythonAnywhere setup
+
+1. Open a PythonAnywhere Bash console and clone the repo:
+
+```bash
+cd ~
+git clone <your-repository-url> Smart-University-Management-System
+cd Smart-University-Management-System
+```
+
+2. Create a virtual environment and install dependencies:
+
+```bash
+mkvirtualenv --python=/usr/bin/python3.12 sums-env
+pip install -r requirements.txt
+```
+
+If Python 3.12 is not available on your PythonAnywhere account, choose the
+newest Python version available in the Web tab and use the same version for the
+virtual environment.
+
+3. Create environment variables. The simplest PythonAnywhere approach is to add
+them near the top of the WSGI file:
+
+```python
+os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.pythonanywhere'
+os.environ['PYTHONANYWHERE_USERNAME'] = 'yourusername'
+os.environ['SECRET_KEY'] = 'replace-with-a-long-random-secret'
+```
+
+You can use `.env.pythonanywhere.example` as the checklist for optional values.
+
+4. Run setup commands:
+
+```bash
+python manage.py migrate --settings=config.settings.pythonanywhere
+python manage.py load_routine --path routine_extracted.json --semester fall --year 2026 --settings=config.settings.pythonanywhere
+python manage.py collectstatic --no-input --settings=config.settings.pythonanywhere
+python manage.py createsuperuser --settings=config.settings.pythonanywhere
+```
+
+5. In the PythonAnywhere **Web** tab:
+
+- Add a new web app.
+- Choose **Manual configuration**, not the Django wizard.
+- Choose the same Python version as your virtual environment.
+- Set **Source code** to `/home/yourusername/Smart-University-Management-System`.
+- Set **Working directory** to `/home/yourusername/Smart-University-Management-System`.
+- Set **Virtualenv** to `sums-env` or `/home/yourusername/.virtualenvs/sums-env`.
+
+6. Open the WSGI file link in the **Web** tab and paste the contents of
+`pythonanywhere_wsgi.py`. Replace `yourusername` with your PythonAnywhere
+username.
+
+7. In the **Static files** section, add:
+
+```text
+URL: /static/
+Directory: /home/yourusername/Smart-University-Management-System/staticfiles
+```
+
+If you use local uploaded media instead of Cloudinary, also add:
+
+```text
+URL: /media/
+Directory: /home/yourusername/Smart-University-Management-System/media
+```
+
+8. Click **Reload** on the Web tab, then open:
+
+```text
+https://yourusername.pythonanywhere.com/
+https://yourusername.pythonanywhere.com/admin/
+```
+
+### If you see the default Django success page
+
+If `https://yourusername.pythonanywhere.com/` shows:
+
+```text
+The install worked successfully! Congratulations!
+You are seeing this page because DEBUG=True ... and you have not configured any URLs.
+```
+
+PythonAnywhere is still running its default Django sample app, not this project.
+Fix the Web-tab WSGI file so it imports this repository's settings and WSGI app.
+
+For example, if your PythonAnywhere username is `Turja221b` and your project
+folder is `/home/Turja221b/Smart_University_Management_System`, use:
+
+```python
+import os
+import sys
+
+PROJECT_DIR = '/home/Turja221b/Smart_University_Management_System'
+
+if PROJECT_DIR not in sys.path:
+    sys.path.insert(0, PROJECT_DIR)
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings.pythonanywhere'
+os.environ['PYTHONANYWHERE_USERNAME'] = 'Turja221b'
+os.environ['SECRET_KEY'] = 'replace-this-with-a-long-random-secret-key'
+
+from django.core.wsgi import get_wsgi_application
+
+application = get_wsgi_application()
+```
+
+Then click **Reload** in the Web tab. Also confirm:
+
+```text
+Source code: /home/Turja221b/Smart_University_Management_System
+Working directory: /home/Turja221b/Smart_University_Management_System
+Virtualenv: /home/Turja221b/.virtualenvs/sums-env
+```
+
 ## Docker
 
 Build and run:
