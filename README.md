@@ -2,7 +2,7 @@
 
 A full-stack university management system built with Django, Django REST Framework, PostgreSQL, JWT authentication, and server-rendered frontend pages. The project manages students, teachers, courses, advising, attendance, exams, notices, and AI-assisted academic insights from one role-based platform.
 
-The repository is prepared for local development, Docker usage, and free Render deployment.
+The repository is prepared for local development, Docker usage, and Railway deployment.
 
 ## Features
 
@@ -19,7 +19,7 @@ The repository is prepared for local development, Docker usage, and free Render 
 - Swagger and ReDoc API documentation via drf-spectacular
 - Production static file serving with WhiteNoise
 - Optional Cloudinary media storage
-- Render-ready `render.yaml`, `build.sh`, `Procfile`, and `runtime.txt`
+- Railway-ready `railway.toml`, plus `Procfile` and `runtime.txt`
 
 ## Tech Stack
 
@@ -33,7 +33,7 @@ The repository is prepared for local development, Docker usage, and free Render 
 | Media storage | Local development or Cloudinary |
 | API docs | drf-spectacular, Swagger UI, ReDoc |
 | Background tasks | Celery with Redis, optional in production |
-| Deployment | Render, Gunicorn, Docker |
+| Deployment | Railway, Gunicorn, Docker |
 
 ## Project Structure
 
@@ -222,43 +222,38 @@ The repository includes `routine_extracted.json`, which is used by the `load_rou
 python manage.py load_routine --path routine_extracted.json --semester fall --year 2026
 ```
 
-The Render build also runs this command after migrations.
+The Railway pre-deploy command also runs this command after migrations.
 
-## Deployment on Render
+## Deployment on Railway
 
-This project includes the files needed for Render deployment:
+This project includes the files needed for Railway deployment:
 
-- `render.yaml`
-- `build.sh`
+- `railway.toml`
 - `Procfile`
 - `runtime.txt`
 
-### Option 1: Render Blueprint
+### GitHub Deployment
 
 1. Push the repository to GitHub.
-2. In Render, choose **New > Blueprint**.
+2. In Railway, create a new project and choose **Deploy from GitHub repo**.
 3. Select this repository.
-4. Render reads `render.yaml`, creates the web service and PostgreSQL database, installs dependencies, collects static files, applies migrations, and starts Gunicorn.
+4. Add a PostgreSQL database service to the Railway project.
+5. Set the required environment variables on the web service.
+6. Generate a public domain from the web service networking settings.
 
-### Option 2: Manual Render Web Service
-
-Use these settings:
-
-```text
-Runtime: Python
-Build Command: bash build.sh
-Start Command: python -m gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
-```
+Railway reads `railway.toml` from the repo. It installs dependencies and collects static files during build, then runs migrations and imports `routine_extracted.json` before starting Gunicorn.
 
 Required environment variables:
 
 ```env
 DJANGO_SETTINGS_MODULE=config.settings.production
 SECRET_KEY=<generate-a-secure-secret>
-DATABASE_URL=<your-render-postgres-url>
-ALLOWED_HOSTS=<your-app-name>.onrender.com
-CSRF_TRUSTED_ORIGINS=https://<your-app-name>.onrender.com
+DATABASE_URL=${{Postgres.DATABASE_URL}}
 ```
+
+Railway also exposes PostgreSQL values as `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `PGHOST`, and `PGPORT`. The app supports those as a fallback, but `DATABASE_URL` is recommended.
+
+`ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` are detected automatically from Railway's `RAILWAY_PUBLIC_DOMAIN` after you generate a public domain. You can still set them manually for a custom domain.
 
 Optional environment variables:
 
@@ -272,9 +267,7 @@ EMAIL_HOST_USER=
 EMAIL_HOST_PASSWORD=
 ```
 
-On a free Render web service, Redis can be omitted. The production settings run Celery tasks inline when `REDIS_URL` is not set.
-
-Render free PostgreSQL databases may expire after 30 days. Upgrade the database if you need persistent production data.
+Redis can be omitted. The production settings run Celery tasks inline when `REDIS_URL` is not set.
 
 ## Docker
 

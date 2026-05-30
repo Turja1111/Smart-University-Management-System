@@ -7,17 +7,23 @@ from decouple import config
 DEBUG = False
 
 _render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
-_allowed_hosts = config('ALLOWED_HOSTS', default=_render_hostname).split(',')
+_railway_hostname = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
+_platform_hosts = ','.join(host for host in [_render_hostname, _railway_hostname] if host)
+
+_allowed_hosts = config('ALLOWED_HOSTS', default=_platform_hosts).split(',')
 ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts if host.strip()]
 
-if _render_hostname and _render_hostname not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(_render_hostname)
+for host in [_render_hostname, _railway_hostname]:
+    if host and host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 
 _csrf_origins = config('CSRF_TRUSTED_ORIGINS', default='').split(',')
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins if origin.strip()]
 
-if _render_hostname:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{_render_hostname}')
+for host in [_render_hostname, _railway_hostname]:
+    origin = f'https://{host}' if host else ''
+    if origin and origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 if not config('REDIS_URL', default=''):
     CELERY_TASK_ALWAYS_EAGER = True

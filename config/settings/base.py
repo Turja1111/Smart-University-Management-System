@@ -103,11 +103,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
+            'NAME': config('DB_NAME', default=config('PGDATABASE', default='')),
+            'USER': config('DB_USER', default=config('PGUSER', default='')),
+            'PASSWORD': config('DB_PASSWORD', default=config('PGPASSWORD', default='')),
+            'HOST': config('DB_HOST', default=config('PGHOST', default='localhost')),
+            'PORT': config('DB_PORT', default=config('PGPORT', default='5432')),
             'CONN_MAX_AGE': _db_conn_max_age,
             'OPTIONS': {
                 # Safer defaults for managed PostgreSQL; harmless for local.
