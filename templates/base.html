@@ -29,6 +29,15 @@
     />
   </head>
   <body {% block body_attrs %}{% endblock %}>
+    {# Demo mode banner — shown only when demo.js activates it #}
+    <div id="demo-banner" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:10px 20px; background:linear-gradient(90deg,#7c3aed,#2563eb); color:#fff; font-size:0.85rem; font-family:'Outfit',sans-serif; z-index:9999; flex-wrap:wrap;">
+      <span>🎓 <strong>Demo Mode</strong> — Previewing as <strong id="demo-banner-role">Student</strong>. No backend required. Data is simulated.</span>
+      <span style="display:flex;gap:8px;align-items:center;">
+        <a href="/login/?demo=student" style="color:#c4b5fd;text-decoration:underline;font-size:0.8rem;">Switch role</a>
+        <button id="demo-banner-exit" onclick="import('/static/js/demo.js').then(m=>{m.deactivateDemo();window.location.href='/login/';})" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:0.8rem;">Exit Demo</button>
+      </span>
+    </div>
+
     {% block body %}
       <div class="app-shell" id="app-shell">
         {% include "partials/_sidebar.html" %}
@@ -45,6 +54,8 @@
     {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    {# demo.js MUST be loaded first — it installs the fetch interceptor before any api.js call #}
+    <script type="module" src="{% static 'js/demo.js' %}?v=10"></script>
     <script type="module" src="{% static 'js/auth.js' %}?v=10"></script>
     <script type="module" src="{% static 'js/api.js' %}?v=10"></script>
     <script type="module" src="{% static 'js/utils.js' %}?v=10"></script>

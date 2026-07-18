@@ -72,9 +72,32 @@
           <button type="submit" class="btn btn-primary btn-lg btn-full" id="login-submit-btn">Sign In</button>
         </form>
 
+        {# ── Demo Mode ──────────────────────────────────────────────────────── #}
+        <div style="margin-top:20px; padding:16px; background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:12px;">
+          <p style="margin:0 0 10px; font-size:0.82rem; color:var(--color-text-muted,#94a3b8); text-align:center; font-weight:500; letter-spacing:0.03em; text-transform:uppercase;">🎯 No account? Try the live demo</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+            <button id="demo-student-btn" type="button"
+              style="padding:10px 6px; border-radius:10px; border:1px solid rgba(124,58,237,0.4); background:rgba(124,58,237,0.12); color:var(--color-text,#e2e8f0); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px;"
+              onmouseover="this.style.background='rgba(124,58,237,0.28)'" onmouseout="this.style.background='rgba(124,58,237,0.12)'">
+              <span style="font-size:1.3rem;">🎓</span>Student
+            </button>
+            <button id="demo-teacher-btn" type="button"
+              style="padding:10px 6px; border-radius:10px; border:1px solid rgba(37,99,235,0.4); background:rgba(37,99,235,0.12); color:var(--color-text,#e2e8f0); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px;"
+              onmouseover="this.style.background='rgba(37,99,235,0.28)'" onmouseout="this.style.background='rgba(37,99,235,0.12)'">
+              <span style="font-size:1.3rem;">👨‍🏫</span>Teacher
+            </button>
+            <button id="demo-admin-btn" type="button"
+              style="padding:10px 6px; border-radius:10px; border:1px solid rgba(16,185,129,0.4); background:rgba(16,185,129,0.12); color:var(--color-text,#e2e8f0); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px;"
+              onmouseover="this.style.background='rgba(16,185,129,0.28)'" onmouseout="this.style.background='rgba(16,185,129,0.12)'">
+              <span style="font-size:1.3rem;">🛡️</span>Admin
+            </button>
+          </div>
+          <p style="margin:10px 0 0; font-size:0.75rem; color:var(--color-text-muted,#94a3b8); text-align:center;">Read-only preview — no credentials needed</p>
+        </div>
+
         <div class="login-divider">or</div>
         <p class="login-switch">
-          Don’t have an account?
+          Don't have an account?
           <a class="login-link" href="/register/">Register</a>
         </p>
       </div>
@@ -83,5 +106,29 @@
 
   {% include "partials/_toast.html" %}
   {% include "partials/_modal.html" %}
+
+  <script type="module">
+    import { activateDemo } from "/static/js/demo.js?v=10";
+
+    const DASHBOARDS = {
+      student: "/student/dashboard/",
+      teacher: "/teacher/dashboard/",
+      admin: "/admin-panel/dashboard/",
+    };
+
+    function launchDemo(role) {
+      activateDemo(role);
+      window.location.href = DASHBOARDS[role] || DASHBOARDS.student;
+    }
+
+    document.getElementById("demo-student-btn")?.addEventListener("click", () => launchDemo("student"));
+    document.getElementById("demo-teacher-btn")?.addEventListener("click", () => launchDemo("teacher"));
+    document.getElementById("demo-admin-btn")?.addEventListener("click", () => launchDemo("admin"));
+
+    // Handle ?demo=role URL param (from banner "Switch role" link)
+    const urlRole = new URLSearchParams(window.location.search).get("demo");
+    if (urlRole && DASHBOARDS[urlRole]) launchDemo(urlRole);
+  </script>
 {% endblock %}
+
 
